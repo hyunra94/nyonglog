@@ -1,0 +1,9 @@
+{
+  "name": "Share Log",
+  "short_name": "ShareLog",
+  "start_url": "./sharelog.html",
+  "display": "standalone",
+  "background_color": "#fdf8ef",
+  "theme_color": "#fdf8ef",
+  "icons": []
+}
