@@ -2779,7 +2779,7 @@ renderCal();renderDashboard();restoreCalendarCache();
       // XLS 가져오기 (쉬운가계부 형식)
       async function importMoneyXls(file){
         if(!window.XLSX){alert('XLSX 라이브러리가 로드되지 않았어요. 잠시 후 다시 시도해주세요.');return}
-        if(!hasPaperConfig()){alert('Worker 설정을 먼저 저장해주세요.');return}
+        if(!window.paperLog?.getConfig?.().secretKey){alert('Worker 설정을 먼저 저장해주세요.');return}
         setMoneyStatus('XLS 파일 분석 중...');
         try{
           const buf=await file.arrayBuffer();
