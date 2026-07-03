@@ -1,25 +1,21 @@
 {
-  "name": "Paper Log Local",
-  "short_name": "Paper Log",
-  "description": "Notion 일정과 로컬 가계부를 함께 쓰는 개인용 PWA",
+  "name": "Nyong Log",
+  "short_name": "Nyong Log",
+  "description": "일정 & 가계부 앱",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
-  "background_color": "#fbf7ed",
-  "theme_color": "#fbf7ed",
+  "background_color": "#ffffff",
+  "theme_color": "#7c6ef5",
   "icons": [
     {
       "src": "./icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "./icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }

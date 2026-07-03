@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>Paper Log</title>
+  <title>Nyong Log</title>
   <link rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#fbf7ed">
-  <meta name="application-name" content="Paper Log">
+  <meta name="application-name" content="Nyong Log">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Paper Log">
+  <meta name="apple-mobile-web-app-title" content="Nyong Log">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <link rel="shortcut icon" type="image/png" href="./icons/icon-192.png">
@@ -17,6 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&family=Gowun+Dodum&family=Patrick+Hand&display=swap" rel="stylesheet">
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <style>
     .goLink{
   display:inline-grid;
@@ -258,7 +259,7 @@
     .moneyRecordHead{display:flex;align-items:center;justify-content:space-between;gap:8px}.moneyRecordTotals{margin:-2px 2px 8px;text-align:right;color:var(--sub);font-size:11px;line-height:1.35}.moneyClearFilter{border:1.2px solid var(--line);border-radius:999px;background:var(--card);font-size:12px;padding:4px 8px;box-shadow:1.5px 1.5px 0 rgba(47,42,40,.08)}
     .moneyRecords li{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid var(--grid);font-size:14px}.moneyRecords li:last-child{border-bottom:0}.moneyRecords small{display:block;color:var(--sub);font-size:11px;line-height:1.45;margin-top:2px}.moneyRecords .amount{font-family:'Gaegu';font-size:21px;font-weight:700;white-space:nowrap}.moneyRecords .wasteTag{display:inline-flex;margin-left:4px;border:1px solid rgba(47,42,40,.45);border-radius:999px;padding:0 5px;background:#f6e7a6;color:#806b2f;font-size:10px}
     .moneyEmpty{margin:0;color:var(--sub);font-family:'Gaegu';font-size:18px;line-height:1.4}.moneyFab{position:fixed;right:calc(18px + env(safe-area-inset-right));bottom:calc(var(--nav) + 26px + env(safe-area-inset-bottom));z-index:46;width:56px;height:56px;border:1.9px solid var(--line);border-radius:999px;background:var(--yellow);box-shadow:4px 4px 0 rgba(47,42,40,.16),0 10px 28px rgba(47,42,40,.14);font-family:'Gaegu';font-size:34px;line-height:1;display:grid;place-items:center}
-    #budget:not(.on) .moneyFab{display:none}.moneyTypeTabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.moneyTypeBtn{border:1.5px solid var(--line);border-radius:999px;background:var(--card);padding:9px 10px;font-family:'Gaegu';font-size:20px;box-shadow:2px 2px 0 rgba(47,42,40,.12)}.moneyTypeBtn.on[data-money-type="expense"]{background:var(--pink)}.moneyTypeBtn.on[data-money-type="income"]{background:var(--blue)}.moneyExpenseOnly[hidden],.moneyIncomeOnly[hidden]{display:none!important}
+    #budget:not(.on) .moneyFab{display:none}.moneyTypeTabs{display:grid;grid-template-columns:1fr 1fr;gap:8px}.moneyTypeBtn{border:1.5px solid var(--line);border-radius:999px;background:var(--card);padding:9px 10px;font-family:'Gaegu';font-size:20px;box-shadow:2px 2px 0 rgba(47,42,40,.12)}.moneyTypeBtn.on[data-money-type="expense"]{background:var(--pink)}.moneyTypeBtn.on[data-money-type="income"]{background:var(--blue)}.moneyExpenseOnly[hidden],.moneyIncomeOnly[hidden]{display:none!important}.moneyRecordFilterBtn.on[data-filter-type="all"]{background:#f4e4a8}.moneyRecordFilterBtn.on[data-filter-type="income"]{background:#c4dff0}.moneyRecordFilterBtn.on[data-filter-type="expense"]{background:#f2cece}.moneyRecordFilterBtn{transition:opacity .15s,filter .15s}.moneyRecordFilterBtn.on{opacity:1!important;filter:none!important}.moneyRecordFilterBtn:not(.on){opacity:.4;filter:saturate(.3)}#moneyRecordFilterTabs[data-active-filter="all"] .moneyRecordFilterBtn[data-filter-type="income"]{opacity:1!important;filter:none!important;background:#c4dff0}#moneyRecordFilterTabs[data-active-filter="all"] .moneyRecordFilterBtn[data-filter-type="expense"]{opacity:1!important;filter:none!important;background:#f2cece}
 
 
     .moneySheetHeadActions{display:flex;gap:8px;align-items:center}
@@ -284,12 +285,17 @@
     /* v24 money UI polish */
     .moneySummaryGrid{grid-template-columns:repeat(10,minmax(0,1fr))!important}
     .moneySummaryGrid .moneySummaryBox:nth-child(1),.moneySummaryGrid .moneySummaryBox:nth-child(2){grid-column:span 5}
+    .moneySummaryGrid .moneySummaryBox:nth-child(3){grid-column:span 4}
     .moneySummaryBox.balance{grid-column:span 6!important}
-    .moneySummaryBox.waste{grid-column:span 4!important}
     #moneyStatsSheet .sheetHead{position:sticky;top:-10px;z-index:12;margin:0 -2px 10px;padding:8px 0 10px;background:rgba(255,253,247,.98);backdrop-filter:blur(10px);border-bottom:1px solid rgba(47,42,40,.12)}
     #moneyStatsSheet .sheetHead h3{font-size:30px}
-    .moneyStatsTabs{grid-template-columns:1fr 1fr auto}.moneyStatsViewBtn{border:1.5px solid var(--line);border-radius:999px;background:#fffaf4;padding:9px 10px;font-family:'Gaegu';font-size:20px;box-shadow:2px 2px 0 rgba(47,42,40,.12)}
-    .moneyStatsViewBtn.on{background:var(--yellow)}
+    .moneyStatsTabs{grid-template-columns:1fr 1fr auto}.moneyStatsViewBtn{border:1.5px solid var(--line);border-radius:999px;background:#fffaf4;padding:9px 10px;font-family:'Gaegu';font-size:20px;box-shadow:2px 2px 0 rgba(47,42,40,.12);transition:opacity .15s,filter .15s}
+    .moneyStatsViewBtn.on{background:#f4e4a8}
+    .moneyStatsTypeBtn{transition:opacity .15s,filter .15s}
+    .moneyStatsTypeBtn.on[data-stats-type="expense"]{background:#f2cece}
+    .moneyStatsTypeBtn.on[data-stats-type="income"]{background:#c4dff0}
+    .moneyStatsTabs:has(.moneyStatsTypeBtn.on) .moneyStatsTypeBtn:not(.on){opacity:.4;filter:saturate(.3)}
+    .moneyStatsTypeBtn:not(.on){opacity:.4;filter:saturate(.3)}
     .moneyStatsList.chartMode{gap:10px}
     .moneyChartRow{border:1.4px solid var(--line);border-radius:16px;background:rgba(255,255,255,.35);padding:10px;display:grid;gap:7px}
     .moneyChartTop{display:flex;justify-content:space-between;gap:8px;align-items:center;font-family:'Gaegu';font-size:20px;line-height:1.1}
@@ -297,6 +303,21 @@
     .moneyChartTrack{height:13px;border:1px solid rgba(47,42,40,.45);border-radius:999px;background:#fffaf2;overflow:hidden}
     .moneyChartFill{height:100%;border-radius:999px;background:var(--pink)}
     .moneyChartFill.income{background:var(--blue)}
+    .moneyDonutSvg{width:100%;max-width:220px;display:block;margin:0 auto 14px}
+    .moneyStatsLegend{display:grid;gap:4px}
+    .moneyStatsLegendRow{display:grid;grid-template-columns:14px 1fr auto auto;gap:6px;align-items:center;font-size:13px;padding:5px 0;border-bottom:1px solid var(--grid)}
+    .moneyStatsLegendRow:last-child{border-bottom:0}
+    .moneyStatsLegendDot{width:14px;height:14px;border-radius:4px;border:1px solid rgba(47,42,40,.3)}
+    .moneyStatsLegendCat{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .moneyStatsLegendPct{font-family:'Gaegu';font-size:15px;color:var(--sub)}
+    .moneyStatsAccordion{display:block!important;cursor:pointer}
+    .moneyStatsRowHead{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+    .moneyStatsToggle{font-size:16px;color:var(--sub);line-height:1;user-select:none}
+    .moneyStatsDetailList{margin-top:8px}
+    .moneyStatsDetailList[hidden]{display:none!important}
+    .moneyStatsDetailRow{display:grid;grid-template-columns:auto 1fr auto;gap:8px;align-items:center;padding:6px 0;border-bottom:1px solid var(--grid);font-size:13px}
+    .moneyStatsDetailRow:last-child{border-bottom:0}
+    .moneyStatsDetailDate{font-family:'Gaegu';font-size:15px;color:var(--sub);white-space:nowrap}
     .moneyFabIcon{font-size:27px;line-height:1;filter:drop-shadow(1px 1px 0 rgba(255,255,255,.65))}
     .moneyStatsFab{background:#d9ebf5}
     .moneyCalcOpenBtn{min-width:46px;width:46px;padding:0;border-radius:15px;background:#f6e7a6;font-size:22px;display:grid;place-items:center}
@@ -1108,14 +1129,55 @@
     }
   </style>
 
+  <style id="bossLootTopV94">
+    .bossChip .bossLootLine{display:none!important}
+    .bossLootBucket{
+      order:-1;
+      margin:0 0 10px!important;
+      border:1.2px dashed rgba(203,130,142,.72);
+      border-radius:17px;
+      padding:9px;
+      background:rgba(250,236,236,.45);
+    }
+    .bossLootBucket .bossBucketTitle{
+      color:#9f4f4f;
+      margin-bottom:6px;
+    }
+    .bossLootItem{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:8px;
+      align-items:center;
+      padding:7px 8px;
+      border-bottom:1px solid rgba(203,130,142,.22);
+      cursor:pointer;
+      color:#8f5656;
+      font-size:14px;
+    }
+    .bossLootItem:last-child{border-bottom:0}
+    .bossLootItem .lootText{
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+    .bossLootItem .lootMoney{
+      font-family:'Gaegu';
+      font-size:18px;
+      font-weight:700;
+      white-space:nowrap;
+    }
+    .bossBucketTitle .tag.y{display:none!important}
+  </style>
+
+
 
 
 </head>
 <body>
 
-  <section class="lockScreen" id="lockScreen" aria-label="Paper Log 잠금 화면">
+  <section class="lockScreen" id="lockScreen" aria-label="Nyong Log 잠금 화면">
     <article class="lockCard">
-      <h1 class="lockLogo">Paper Log</h1>
+      <h1 class="lockLogo">Nyong Log</h1>
       <p class="lockSub">이 기기에서 사용할 Worker 주소와 SECRET Key를 입력해 주세요.</p>
       <form class="lockForm" id="paperLockForm">
         <div class="lockField">
@@ -1148,7 +1210,7 @@
   <main class="app">
     <div class="sticky">
       <div class="stickyTop" id="stickyTop">
-        <h1 class="stickyLogo">Paper Log</h1>
+        <h1 class="stickyLogo">Nyong Log</h1>
         <button class="menuBtn" id="openSettings" type="button" aria-label="설정 열기">☰</button>
         <p class="stickyMonth" id="stickyMonthLabel">현재 날짜 기준</p>
       </div>
@@ -1160,15 +1222,9 @@
       <article class="card dash">
         <div class="divTitle">오늘 요약</div>
         <div class="grid2">
-          <button class="mini jump" data-target="calendar"><h3><span class="blue">캘린더</span></h3><p id="dashCalendarSummary">오늘 일정/할 일 불러오는 중</p></button>
+          <button class="mini jump" data-target="calendar"><h3><span class="blue">캘린더</span></h3><p id="dashCalendarSummary">오늘 일정 불러오는 중</p></button>
           <button class="mini jump" data-target="budget"><h3><span class="pink">가계부</span></h3><p id="dashMoneySummary">오늘 기준 월 가계부 불러오는 중</p></button>
-          <button class="mini" data-scroll="habitBlock"><h3><span class="green">해빗</span></h3><p id="dashHabitSummary">오늘 해빗 체크 요약</p></button>
-          <button class="mini jump" data-target="boss"><h3><span class="purple">보스</span></h3><p id="dashBossSummary">이번 주 보스 요약</p></button>
         </div>
-      </article>
-      <article class="card">
-        <div class="divTitle">오늘 할 일</div>
-        <ul class="list" id="dashboardTodayList"><li><span class="check done"></span><span>교육 신청자 DB 확인</span><span class="tag g">완료</span></li><li><span class="check done"></span><span>안내 문자 초안 정리</span><span class="tag b">업무</span></li><li><span class="check"></span><span>수료증 발급 자동화 점검</span><span class="tag y">중요</span></li></ul>
       </article>
       <article class="card" id="habitBlock">
         <div class="divTitle">Habit Tracker</div>
@@ -1177,7 +1233,7 @@
     </section>
 
     <section id="calendar" class="page">
-      <div class="title"><h2>Calendar</h2><small>Schedule + Tasks · Mon start</small></div>
+      <div class="title"><h2>Calendar</h2><small>Schedule · Mon start</small></div>
       <div class="calendarTopBar">
         <button class="calendarMonthBtn" id="prevMonth" type="button" aria-label="지난 달">‹</button>
         <div class="calendarMonthTitle" id="monthTitle">May 2026</div>
@@ -1185,7 +1241,7 @@
         <button class="calendarMonthBtn" id="nextMonth" type="button" aria-label="다음 달">›</button>
       </div>
       <article class="card calendarCard">
-        <div class="tabs calendarTabs"><button class="tab on" data-type="schedule">일정</button><button class="tab on" data-type="todo">할 일</button><label class="cancelMini" title="취소 일정 보기"><input type="checkbox" id="showCanceledSchedules"><span>취소</span></label></div><p class="syncStatus" id="syncStatus">메뉴에서 Notion을 불러오거나 설정을 저장하면 자동으로 동기화됩니다.</p>
+        <div class="tabs calendarTabs" style="grid-template-columns:1fr auto"><button class="tab on" data-type="schedule">일정</button><label class="cancelMini" title="취소 일정 보기"><input type="checkbox" id="showCanceledSchedules"><span>취소</span></label></div><p class="syncStatus" id="syncStatus">Notion에서 일정을 불러옵니다. 오프라인에서는 캐시를 사용합니다.</p>
         <div class="calendarWide">
           <div class="calendarMain">
             <div class="cal" id="calendarGrid"></div>
@@ -1207,12 +1263,15 @@
         <button class="moneyTodayBtn" id="moneyTodayBtn" type="button">오늘</button>
         <button class="moneyMonthBtn" id="moneyNextMonth" type="button" aria-label="다음 달">›</button>
       </div>
+      <div style="display:flex;gap:8px;margin:0 0 8px">
+        <button class="cancel" id="moneyXlsImportBtn" type="button" style="flex:1;border-radius:999px;font-size:17px">📥 XLS 가져오기</button>
+      </div>
       <article class="card dash">
         <div class="moneySummaryGrid">
           <div class="moneySummaryBox"><span>이번 달 수입</span><strong class="income" id="moneyIncomeTotal">0</strong></div>
           <div class="moneySummaryBox"><span>이번 달 지출</span><strong class="expense" id="moneyExpenseTotal">0</strong></div>
+          <div class="moneySummaryBox"><span>이번 달 저축</span><strong style="color:#5a7a5a" id="moneySavingsTotal">0</strong></div>
           <div class="moneySummaryBox balance"><span>이번 달 잔액</span><strong id="moneyBalanceTotal">0</strong></div>
-          <div class="moneySummaryBox waste"><span>낭비 지출</span><strong class="expense" id="moneyWasteTotal">0</strong></div>
         </div>
         <p class="moneyStatus" id="moneyStatus">가계부 데이터를 불러오는 중...</p>
         <input id="expenseDate" type="hidden"><input id="incomeDate" type="hidden">
@@ -1223,21 +1282,22 @@
       </article>
       <article class="card">
         <div class="moneyRecordHead"><div class="divTitle" style="margin:8px 0 6px;flex:1" id="moneyRecordTitle">이번 달 기록</div><button class="moneyClearFilter" id="moneyClearFilter" type="button" hidden>월 전체</button></div>
+        <div class="moneyTypeTabs" id="moneyRecordFilterTabs" style="grid-template-columns:repeat(4,1fr);margin:0 0 8px">
+          <button class="moneyTypeBtn moneyRecordFilterBtn on" data-filter-type="all" type="button">전체</button>
+          <button class="moneyTypeBtn moneyRecordFilterBtn" data-filter-type="income" type="button">수입</button>
+          <button class="moneyTypeBtn moneyRecordFilterBtn" data-filter-type="expense" type="button">지출</button>
+          <button class="moneyTypeBtn moneyRecordFilterBtn" data-filter-type="savings" type="button">저축</button>
+        </div>
         <p class="moneyRecordTotals" id="moneyRecordTotals" hidden></p>
         <ul class="moneyList moneyRecords" id="moneyRecordList"></ul>
       </article>
+      <input type="file" id="moneyXlsInput" accept=".xls,.xlsx" hidden>
       <button class="moneyFab moneyStatsFab" id="openMoneyStats" type="button" aria-label="가계부 통계"><img class="statsIconImg" src="./icons/stats-icon.png" alt=""></button>
       <button class="moneyFab" id="openMoneyEntry" type="button" aria-label="가계부 입력">＋</button>
     </section>
 
-    <section id="boss" class="page">
-      <div class="title"><h2>Maple Boss</h2><small>default boss setup → weekly generate</small></div>
-      <article class="card"><div class="weekCard bossWeekNavCard"><div><span class="weekLabel">보스 주차</span><div class="bossWeekNav"><button class="weekArrow" id="bossPrevWeek" type="button" aria-label="이전 주">◀</button><strong id="bossWeekTitle">이번 주</strong><button class="weekArrow" id="bossNextWeek" type="button" aria-label="다음 주">▶</button></div><p>화살표로 주차를 이동해서 해당 주차 보스 기록을 불러옵니다.</p></div><button class="icon" id="bossTodayWeek" type="button" aria-label="오늘 주차">↺</button></div><div class="bossTool"><button class="bossAction setup" id="openBossSetting">기본 보스 설정</button><button class="bossAction gen" id="generateBoss">선택 주차 생성</button><button class="bossAction setup" id="loadBossNotion" type="button">선택 주차 불러오기</button></div></article>
-      <article class="card"><div class="divTitle">캐릭터 필터</div><div class="chips" id="characterChips"></div></article>
-      <article class="card"><div class="divTitle">이번 주 보스 체크</div><div class="bossSum bossSumV47"><div><span>보스 수</span><strong id="bossCount">0개</strong></div><div><span>예정 메소</span><strong id="bossExpectedTotal">0</strong></div><div><span>득템</span><strong id="bossLootTotal">0</strong></div><div><span>결정석</span><strong id="bossCrystalTotal">0</strong></div></div><div id="bossList"></div><p class="note">나중에 Worker API 연결 시 보스 체크 기록 DB에 실제 페이지 생성</p></article>
-    </section>
 
-    <div class="sheetBg" id="entrySheet" hidden><section class="sheet"><div class="handle"></div><div class="sheetHead entrySheetHead"><h3 id="entrySheetTitle">기록 추가</h3><div class="entrySheetHeadActions"><button class="icon entryDeleteBtn" id="deleteEntry" type="button" hidden aria-label="기록 삭제">🗑</button><button class="icon" id="closeEntry" type="button">×</button></div></div><form class="entryForm" id="entryForm"><div class="typeToggle"><label class="typeChip"><input type="checkbox" id="addSchedule"> 일정 DB</label><label class="typeChip"><input type="checkbox" id="addTodo"> 할 일 DB</label><input type="checkbox" id="addDaily" hidden></div><div class="field"><label>제목</label><input id="entryTitle" placeholder="예: 교육 운영 회의"></div><div class="row2">
+    <div class="sheetBg" id="entrySheet" hidden><section class="sheet"><div class="handle"></div><div class="sheetHead entrySheetHead"><h3 id="entrySheetTitle">기록 추가</h3><div class="entrySheetHeadActions"><button class="icon entryDeleteBtn" id="deleteEntry" type="button" hidden aria-label="기록 삭제">🗑</button><button class="icon" id="closeEntry" type="button">×</button></div></div><form class="entryForm scheduleSel" id="entryForm"><input type="checkbox" id="addSchedule" hidden checked><input type="checkbox" id="addTodo" hidden><input type="checkbox" id="addDaily" hidden><div class="field"><label>제목</label><input id="entryTitle" placeholder="예: 교육 운영 회의"></div><div class="row2">
   <div class="field">
     <label>시작일</label>
     <input id="entryDate" type="date" required>
@@ -1251,46 +1311,10 @@
 <div class="field scheduleOnly">
   <label>시간</label>
   <input id="entryTime" type="time">
-</div><div class="row2 scheduleTodoOnly"><div class="field"><label id="entrySubjectLabel">분류</label><textarea id="entrySubject" rows="2" placeholder="업무, 회의, 생활"></textarea></div><div class="field todoOnly"><label>구분</label><select id="entryDone"><option value="work">업무</option><option value="personal">개인</option></select></div></div>
+</div><div class="field"><label id="entrySubjectLabel">분류</label><textarea id="entrySubject" rows="2" placeholder="약속, 업무일정, 개인일정"></textarea></div>
 <div class="field scheduleOnly appointmentOnly"><label>약속 대상</label><input id="entryAppointmentTarget" placeholder="예: 친구, 가족, 수민"></div>
-<div class="row2 dailyOnly"><div class="field"><label>Mood</label><select id="entryMood"><option value="happy">happy · 좋음</option><option value="sad">sad · 슬픔</option><option value="angry">angry · 화남</option><option value="sleepy">sleepy · 졸림</option><option value="surprised">surprised · 놀람</option></select></div></div>
-<div class="field dailyOnly"><label>한줄 일기</label><input id="entryDailyText" placeholder="오늘을 한 줄로 남겨줘"></div>
-<div class="field scheduleTodoOnly"><label>관련 프로젝트</label><select id="entryProject"><option value="">선택 안 함</option></select></div><button class="save" id="entrySaveBtn">Notion에 추가하기</button><p class="sheetNote">할 일은 업무/개인을 고를 수 있고, 개인 선택 시 개인 프로젝트가 자동 선택돼요.</p></form></section></div>
+<div class="field"><label>관련 프로젝트</label><select id="entryProject"><option value="">선택 안 함</option></select></div><button class="save" id="entrySaveBtn">일정 저장</button><p class="sheetNote">일정을 Notion에 저장합니다. 오프라인 시 캐시에 임시 보관됩니다.</p></form></section></div>
 
-    <div class="sheetBg" id="dailySheet" hidden>
-      <section class="sheet">
-        <div class="handle"></div>
-        <div class="sheetHead entrySheetHead">
-          <h3 id="dailySheetTitle">Daily Log</h3>
-          <div class="entrySheetHeadActions">
-            <button class="icon entryDeleteBtn" id="deleteDailyLog" type="button" hidden aria-label="하루 기록 삭제">🗑</button>
-            <button class="icon" id="closeDailyLog" type="button">×</button>
-          </div>
-        </div>
-        <form class="entryForm" id="dailyForm">
-          <div class="field">
-            <label>날짜</label>
-            <input id="dailyDate" type="date" required>
-          </div>
-          <div class="field">
-            <label>Mood</label>
-            <select id="dailyMood">
-              <option value="happy">happy · 좋음</option>
-              <option value="sad">sad · 슬픔</option>
-              <option value="angry">angry · 화남</option>
-              <option value="sleepy">sleepy · 졸림</option>
-              <option value="surprised">surprised · 놀람</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>한줄 일기</label>
-            <input id="dailyText" placeholder="오늘을 한 줄로 남겨줘" autocomplete="off">
-          </div>
-          <button class="save" id="dailySaveBtn" type="submit">Daily Log 저장</button>
-          <p class="sheetNote" id="dailyStatus">선택한 날짜에 mood와 한줄 일기를 저장해요.</p>
-        </form>
-      </section>
-    </div>
 
     <div class="schedulePopupBg" id="schedulePopupBg" hidden>
       <section class="schedulePopup" id="schedulePopup" role="dialog" aria-label="선택 날짜 일정">
@@ -1306,9 +1330,10 @@
         <div class="handle"></div>
         <div class="sheetHead"><h3>가계부 통계</h3><button class="icon" id="closeMoneyStats" type="button">×</button></div>
         <div class="moneyStatsHead"><span id="moneyStatsMonth">현재 월</span><strong class="moneyStatsTotal" id="moneyStatsTotal">0</strong></div>
-        <div class="moneyTypeTabs moneyStatsTabs">
+        <div class="moneyTypeTabs moneyStatsTabs" style="grid-template-columns:1fr 1fr 1fr auto">
           <button class="moneyTypeBtn moneyStatsTypeBtn on" data-stats-type="expense" type="button">지출</button>
           <button class="moneyTypeBtn moneyStatsTypeBtn" data-stats-type="income" type="button">수입</button>
+          <button class="moneyTypeBtn moneyStatsTypeBtn" data-stats-type="savings" type="button">저축</button>
           <button class="moneyStatsViewBtn" id="moneyStatsChartBtn" type="button">차트</button>
         </div>
         <div class="moneyStatsList" id="moneyStatsList"></div>
@@ -1316,7 +1341,7 @@
       </section>
     </div>
 
-    <div class="sheetBg" id="settingsSheet" hidden><section class="sheet"><div class="handle"></div><div class="sheetHead"><h3>Paper Log 설정</h3><button class="icon" id="closeSettings" type="button">×</button></div><div class="ruleBox"><strong>Notion / Worker 연결</strong><span>Worker 주소와 SECRET Key는 이 기기에 저장됩니다.</span><span>Notion 토큰과 DB ID는 Cloudflare Worker에만 등록해 주세요.</span></div><form class="entryForm" id="settingsForm"><div class="field"><label>Worker 앞부분</label><input id="settingWorkerName" autocomplete="off" placeholder="예: paperlog"></div><div class="field"><label>Cloudflare ID</label><input id="settingWorkerId" autocomplete="off" placeholder="예: hyunra94"></div><div class="field"><label>SECRET Key</label><input id="settingSecretKey" type="password" autocomplete="current-password" placeholder="Cloudflare Worker의 SECRET_KEY"></div><label class="typeChip" style="justify-content:flex-start"><input type="checkbox" id="settingRememberSecret" checked> 이 기기에 SECRET Key 저장</label><div class="field"><label>보기 모드</label><select id="settingViewMode"><option value="personal">전체 보기</option><option value="work">회사 보기</option></select></div><button class="save" id="saveSettings" type="submit">설정 저장</button><button class="cancel" id="settingLoadNotion" type="button">Notion 불러오기</button><button class="cancel" id="installPwaBtn" type="button" hidden>앱 설치</button><button class="cancel" id="clearSettings" type="button">저장된 설정 지우기</button><p class="sheetNote" id="settingsStatus">설정 저장 후 자동으로 현재 월 일정/할 일을 불러옵니다.</p></form></section></div>
+    <div class="sheetBg" id="settingsSheet" hidden><section class="sheet"><div class="handle"></div><div class="sheetHead"><h3>Nyong Log 설정</h3><button class="icon" id="closeSettings" type="button">×</button></div><div class="ruleBox"><strong>Worker 연결</strong><span>캘린더 일정은 Notion에, 가계부는 Cloudflare D1에 저장됩니다.</span><span>Worker 주소와 SECRET Key는 이 기기에 저장됩니다.</span></div><form class="entryForm" id="settingsForm"><div class="field"><label>Worker 앞부분</label><input id="settingWorkerName" autocomplete="off" placeholder="예: nyong-log"></div><div class="field"><label>Cloudflare ID</label><input id="settingWorkerId" autocomplete="off" placeholder="예: hyunra94"></div><div class="field"><label>SECRET Key</label><input id="settingSecretKey" type="password" autocomplete="current-password" placeholder="Cloudflare Worker의 SECRET_KEY"></div><label class="typeChip" style="justify-content:flex-start"><input type="checkbox" id="settingRememberSecret" checked> 이 기기에 SECRET Key 저장</label><button class="save" id="saveSettings" type="submit">설정 저장</button><button class="cancel" id="settingLoadNotion" type="button">캘린더 동기화</button><button class="cancel" id="installPwaBtn" type="button" hidden>앱 설치</button><button class="cancel" id="clearSettings" type="button">저장된 설정 지우기</button><p class="sheetNote" id="settingsStatus">설정 저장 후 캘린더 일정을 자동으로 불러옵니다.</p></form></section></div>
 
 
 
@@ -1325,20 +1350,18 @@
         <div class="handle"></div>
         <div class="sheetHead moneySheetHead"><h3 id="moneySheetTitle">가계부 입력</h3><div class="moneySheetHeadActions"><button class="icon moneyDeleteBtn" id="deleteMoneyEntry" type="button" hidden aria-label="가계부 기록 삭제">🗑</button><button class="icon" id="closeMoneyEntry" type="button">×</button></div></div>
         <form class="entryForm" id="moneyEntryForm">
-          <div class="moneyTypeTabs">
+          <div class="moneyTypeTabs" style="grid-template-columns:repeat(3,1fr)">
             <button class="moneyTypeBtn on" data-money-type="expense" type="button">지출</button>
             <button class="moneyTypeBtn" data-money-type="income" type="button">수입</button>
+            <button class="moneyTypeBtn" data-money-type="savings" type="button">저축</button>
           </div>
           <div class="field"><label>내용</label><input id="moneyEntryTitle" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" required placeholder="예: 주유비, 5월 월급"></div>
           <div class="row2"><div class="field"><label>날짜</label><input id="moneyEntryDate" type="date" required></div><div class="field"><label>금액</label><div class="moneyAmountControl"><input id="moneyEntryAmount" inputmode="decimal" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" required placeholder="12000"><button class="moneyCalcOpenBtn" id="openMoneyCalc" type="button" aria-label="계산기 열기" title="계산기"><img class="calcIconImg" src="./icons/calc-icon.png" alt=""></button></div></div></div>
           <div class="row2"><div class="field"><label>분류</label><select id="moneyEntrySubject"></select></div><div class="field"><label id="moneyCardLabel">결제수단</label><select id="moneyEntryCard"></select></div></div>
           <div class="field moneyIncomeOnly" hidden><label>기타</label><input id="moneyEntryMemo" placeholder="수입 메모"></div>
-          <div class="moneyCheckRow moneyExpenseOnly">
-            <label class="typeChip"><input type="checkbox" id="moneyEntryWaste"> 낭비 지출</label>
-            <label class="typeChip"><input type="checkbox" id="moneyEntryDone" checked> 입력완료</label>
-          </div>
-          <div class="moneySaveActions"><button class="save" type="submit">Notion에 저장</button><button class="cancel" id="moneySaveContinue" type="button">연속 추가</button></div>
+          <div class="moneySaveActions"><button class="save" type="submit">저장하기</button><button class="cancel" id="moneySaveContinue" type="button">연속 추가</button></div>
           <p class="sheetNote" id="moneyEntryStatus">저장 후 현재 월 가계부가 자동으로 갱신됩니다.</p>
+          <p class="sheetNote" id="moneyEntryError" style="color:#b55b5b;display:none"></p>
         </form>
       </section>
     </div>
@@ -1377,39 +1400,15 @@
     </div>
 
 
-    <div class="sheetBg" id="bossSheet" hidden><section class="sheet"><div class="handle"></div><div class="sheetHead"><h3>기본 주간 보스 설정</h3><div class="bossSheetActions"><button class="icon" id="bossRuleHelp" type="button" aria-label="설정 규칙 보기">?</button><button class="icon" id="closeBoss">×</button></div></div><div class="ruleBox bossRuleBox" id="bossRuleBox" hidden><strong>설정 규칙</strong><span>같은 보스 계열은 1개만 저장됩니다.</span><span>주간 보스는 최대 12개까지만 저장됩니다.</span><span>월간 보스는 별도 월 1회 기준으로 생성됩니다.</span></div><div class="bossSettingSticky"><div class="bossSettingSummary" id="bossSettingSummary"></div><div class="field bossSettingCharacter"><label>캐릭터</label><select id="bossCharSelect"></select></div></div><div class="bossGrid" id="bossSettingGrid"></div><p class="sheetNote" id="bossSettingNote">선택하면 자동으로 저장됩니다.</p><div class="sheetActions"><button class="cancel" id="cancelBoss" type="button">닫기</button><button class="save" id="saveBoss" type="button">저장 후 닫기</button></div></section></div>
 
-    <div class="sheetBg" id="bossLootSheet" hidden>
-      <section class="sheet">
-        <div class="handle"></div>
-        <div class="sheetHead">
-          <h3 id="bossLootTitle">득템 메모</h3>
-          <button class="icon" id="closeBossLoot" type="button">×</button>
-        </div>
-        <form class="entryForm" id="bossLootForm">
-          <div class="field">
-            <label>물욕템 or 메모</label>
-            <textarea id="bossLootMemo" rows="6" placeholder="예: 거공 50억\n마도서 120억"></textarea>
-          </div>
-          <p class="sheetNote" id="bossLootCalc">득템 합계 0억</p>
-          <div class="sheetActions">
-            <button class="cancel" id="clearBossLoot" type="button">비우기</button>
-            <button class="save" type="submit">저장</button>
-          </div>
-        </form>
-      </section>
-    </div>
   </main>
 
-  <nav class="nav"><button class="navBtn on" data-target="dashboard"><svg viewBox="0 0 24 24"><path d="M5 5.5h14v13H5z"/><path d="M8 9h8M8 12h5M8 15h7"/></svg><span>Home</span></button><button class="navBtn" data-target="calendar"><svg viewBox="0 0 24 24"><path d="M5 6h14v13H5z"/><path d="M8 4v4M16 4v4M5 10h14"/><path d="M8 13h2M12 13h2M16 13h2"/></svg><span>Calendar</span></button><button class="navBtn" data-target="budget"><svg viewBox="0 0 24 24"><path d="M5 8h14v10H5z"/><path d="M7 8V6h9v2"/><path d="M15.5 13.5h2"/></svg><span>Money</span></button><button class="navBtn" data-target="boss"><svg viewBox="0 0 24 24"><path d="M6 9l2-4 4 3 4-3 2 4"/><path d="M7 10h10l-1 8H8z"/><path d="M10 13h.1M14 13h.1"/></svg><span>Boss</span></button></nav>
+  <nav class="nav" style="grid-template-columns:repeat(3,minmax(0,1fr))"><button class="navBtn on" data-target="dashboard"><svg viewBox="0 0 24 24"><path d="M5 5.5h14v13H5z"/><path d="M8 9h8M8 12h5M8 15h7"/></svg><span>Home</span></button><button class="navBtn" data-target="calendar"><svg viewBox="0 0 24 24"><path d="M5 6h14v13H5z"/><path d="M8 4v4M16 4v4M5 10h14"/><path d="M8 13h2M12 13h2M16 13h2"/></svg><span>Calendar</span></button><button class="navBtn" data-target="budget"><svg viewBox="0 0 24 24"><path d="M5 8h14v10H5z"/><path d="M7 8V6h9v2"/><path d="M15.5 13.5h2"/></svg><span>Money</span></button></nav>
 
   <script>
     document.addEventListener('DOMContentLoaded',()=>{
       const PAPER_CONFIG_KEY='paperLogWorkerConfig';
       const PAPER_SECRET_KEY='paperLogSecretKey';
-      const VIEW_MODE_KEY='paperLogViewMode';
-      const urlMode=new URLSearchParams(location.search).get('mode');
-      let currentViewMode=(urlMode==='work'||urlMode==='company')?'work':(urlMode==='personal'?'personal':(localStorage.getItem(VIEW_MODE_KEY)||'personal'));
       const getStoredConfig=()=>{
         try{return JSON.parse(localStorage.getItem(PAPER_CONFIG_KEY)||'{}')}catch{return {}}
       };
@@ -1448,18 +1447,6 @@
         });
       };
       window.paperLog={getConfig:getPaperConfig,getApiBase:getPaperApiBase,fetch:paperFetch,clear:clearPaperConfig};
-      function applyViewMode(mode=currentViewMode){
-        currentViewMode=mode==='work'?'work':'personal';
-        document.body.classList.toggle('viewWork',currentViewMode==='work');
-        const select=$('#settingViewMode');if(select)select.value=currentViewMode;
-        const active=$('.page.on')?.id;
-        if(currentViewMode==='work'&&(active==='budget'||active==='boss'))page('dashboard',{scroll:false});
-      }
-      function setViewMode(mode){
-        currentViewMode=mode==='work'?'work':'personal';
-        localStorage.setItem(VIEW_MODE_KEY,currentViewMode);
-        applyViewMode(currentViewMode);
-      }
 
       const lockForm=document.querySelector('#paperLockForm');
       const lockStatus=document.querySelector('#lockStatus');
@@ -1516,100 +1503,21 @@
       const today=nowKST(); let view=new Date(today.getFullYear(),today.getMonth(),1), selected=key(today);
       const HOLIDAYS_KR={'2026-01-01':'신정','2026-02-16':'설날 연휴','2026-02-17':'설날','2026-02-18':'설날 연휴','2026-03-01':'삼일절','2026-03-02':'삼일절 대체공휴일','2026-05-05':'어린이날','2026-05-24':'부처님오신날','2026-05-25':'부처님오신날 대체공휴일','2026-06-06':'현충일','2026-08-15':'광복절','2026-08-17':'광복절 대체공휴일','2026-09-24':'추석 연휴','2026-09-25':'추석','2026-09-26':'추석 연휴','2026-10-03':'개천절','2026-10-05':'개천절 대체공휴일','2026-10-09':'한글날','2026-12-25':'성탄절'};
       const isWeekend=d=>d.getDay()===0||d.getDay()===6, isHoliday=d=>Boolean(HOLIDAYS_KR[key(d)]);
-      const state={show:{schedule:true,todo:true},showCanceled:false,tasks:[{date:key(today),title:'수료증 발급 자동화 점검',subject:'중요',color:'task',done:false},{date:key(today),title:'교육 신청자 DB 확인',subject:'업무',color:'task',done:true}],schedules:[{date:key(today),time:'09:30',title:'주간 업무 체크',subject:'업무일정',color:'work'},{date:key(today),time:'13:30',title:'친구 약속',subject:'약속',color:'meeting'},{date:key(today),time:'18:30',title:'필라테스',subject:'개인일정',color:'personal'}],dailyLogs:[]};
-      let editingCalendarRecord=null; let editingDailyRecord=null; let dashboardTodaySchedules=null; let dashboardTodayTodos=null; let projectOptions=[];
-      const chars=[{id:'all',name:'전체'},{id:'c1',name:'숍슈슈'},{id:'c2',name:'렌슈솜'},{id:'c3',name:'양슈슈'},{id:'c4',name:'썬슈슈'},{id:'c5',name:'현라양'}];
-      const bosses=[
-        {id:'b01',name:'익스트림 검은 마법사',family:'검은 마법사',cycle:'monthly',price:9200000000,exception:true},
-        {id:'b02',name:'하드 검은 마법사',family:'검은 마법사',cycle:'monthly',price:700000000,exception:true},
-        {id:'b03',name:'익스트림 카링',family:'카링',cycle:'weekly',price:5670000000},
-        {id:'b04',name:'하드 카링',family:'카링',cycle:'weekly',price:1830000000},
-        {id:'b05',name:'노멀 카링',family:'카링',cycle:'weekly',price:714000000},
-        {id:'b06',name:'이지 카링',family:'카링',cycle:'weekly',price:419000000},
-        {id:'b07',name:'익스트림 최초의 대적자',family:'최초의 대적자',cycle:'weekly',price:4960000000},
-        {id:'b08',name:'하드 최초의 대적자',family:'최초의 대적자',cycle:'weekly',price:1510000000},
-        {id:'b09',name:'노멀 최초의 대적자',family:'최초의 대적자',cycle:'weekly',price:589000000},
-        {id:'b10',name:'이지 최초의 대적자',family:'최초의 대적자',cycle:'weekly',price:324000000},
-        {id:'b11',name:'익스트림 감시자 칼로스',family:'감시자 칼로스',cycle:'weekly',price:4320000000},
-        {id:'b12',name:'카오스 감시자 칼로스',family:'감시자 칼로스',cycle:'weekly',price:1340000000},
-        {id:'b13',name:'노멀 감시자 칼로스',family:'감시자 칼로스',cycle:'weekly',price:561000000},
-        {id:'b14',name:'이지 감시자 칼로스',family:'감시자 칼로스',cycle:'weekly',price:311000000},
-        {id:'b15',name:'하드 발드릭스',family:'발드릭스',cycle:'weekly',price:3240000000},
-        {id:'b16',name:'노멀 발드릭스',family:'발드릭스',cycle:'weekly',price:1440000000},
-        {id:'b17',name:'익스트림 선택받은 세렌',family:'선택받은 세렌',cycle:'weekly',price:3150000000},
-        {id:'b18',name:'하드 선택받은 세렌',family:'선택받은 세렌',cycle:'weekly',price:396000000},
-        {id:'b19',name:'노멀 선택받은 세렌',family:'선택받은 세렌',cycle:'weekly',price:266000000},
-        {id:'b20',name:'하드 림보',family:'림보',cycle:'weekly',price:2510000000},
-        {id:'b21',name:'노멀 림보',family:'림보',cycle:'weekly',price:1080000000},
-        {id:'b22',name:'익스트림 스우',family:'스우',cycle:'weekly',price:640000000},
-        {id:'b23',name:'하드 스우',family:'스우',cycle:'weekly',price:54200000},
-        {id:'b24',name:'노멀 스우',family:'스우',cycle:'weekly',price:17600000},
-        {id:'b25',name:'하드 데미안',family:'데미안',cycle:'weekly',price:51500000},
-        {id:'b26',name:'노멀 데미안',family:'데미안',cycle:'weekly',price:18400000},
-        {id:'b27',name:'하드 진 힐라',family:'진 힐라',cycle:'weekly',price:112000000},
-        {id:'b28',name:'노멀 진 힐라',family:'진 힐라',cycle:'weekly',price:74900000},
-        {id:'b29',name:'하드 듄켈',family:'듄켈',cycle:'weekly',price:99400000},
-        {id:'b30',name:'노멀 듄켈',family:'듄켈',cycle:'weekly',price:50000000},
-        {id:'b31',name:'카오스 더스크',family:'더스크',cycle:'weekly',price:73500000},
-        {id:'b32',name:'노멀 더스크',family:'더스크',cycle:'weekly',price:46300000},
-        {id:'b33',name:'하드 루시드',family:'루시드',cycle:'weekly',price:66200000},
-        {id:'b34',name:'노멀 루시드',family:'루시드',cycle:'weekly',price:37500000},
-        {id:'b35',name:'이지 루시드',family:'루시드',cycle:'weekly',price:31400000},
-        {id:'b36',name:'하드 윌',family:'윌',cycle:'weekly',price:81200000},
-        {id:'b37',name:'노멀 윌',family:'윌',cycle:'weekly',price:43300000},
-        {id:'b38',name:'이지 윌',family:'윌',cycle:'weekly',price:34000000},
-        {id:'b39',name:'카오스 가디언 엔젤 슬라임',family:'가디언 엔젤 슬라임',cycle:'weekly',price:79100000},
-        {id:'b40',name:'노멀 가디언 엔젤 슬라임',family:'가디언 엔젤 슬라임',cycle:'weekly',price:26800000},
-        {id:'b41',name:'카오스 파풀라투스',family:'파풀라투스',cycle:'weekly',price:13800000},
-        {id:'b42',name:'카오스 벨룸',family:'벨룸',cycle:'weekly',price:9280000},
-        {id:'b43',name:'하드 매그너스',family:'매그너스',cycle:'weekly',price:8560000},
-        {id:'b44',name:'카오스 피에르',family:'피에르',cycle:'weekly',price:8150000},
-        {id:'b45',name:'카오스 반반',family:'반반',cycle:'weekly',price:8140000},
-        {id:'b46',name:'카오스 블러디 퀸',family:'블러디 퀸',cycle:'weekly',price:8080000},
-        {id:'b47',name:'카오스 자쿰',family:'자쿰',cycle:'weekly',price:7500000},
-        {id:'b48',name:'노멀 시그너스',family:'시그너스',cycle:'weekly',price:6580000},
-        {id:'b49',name:'카오스 핑크빈',family:'핑크빈',cycle:'weekly',price:6580000},
-        {id:'b50',name:'하드 힐라',family:'힐라',cycle:'weekly',price:5750000},
-        {id:'b51',name:'노멀 카이',family:'카이',cycle:'weekly',price:300000000,exception:true}
-      ];
-      const bossSet={c1:['b10','b06','b27','b29','b36'],c2:['b10','b27','b36'],c3:['b10','b18','b23','b25'],c4:['b27','b29','b31','b33'],c5:[]}; let bossFilter='all', bossRecords=[], bossLootMemos={}, showLowBosses=false, bossSettingActiveCharId='', bossAutoSaveTimer=null, editingBossLootKey='', bossViewBaseDate=new Date(today);
+      const state={show:{schedule:true},showCanceled:false,schedules:[{date:key(today),time:'09:30',title:'주간 업무 체크',subject:'업무일정',color:'work'},{date:key(today),time:'13:30',title:'친구 약속',subject:'약속',color:'meeting'},{date:key(today),time:'18:30',title:'필라테스',subject:'개인일정',color:'personal'}]};
+      let editingCalendarRecord=null; let dashboardTodaySchedules=null; let projectOptions=[];
       const won=n=>new Intl.NumberFormat('ko-KR').format(n);
       const eok=n=>{const v=n/100000000;return `${Number.isInteger(v)?v:v.toFixed(v<1?2:1).replace(/0$/,'').replace(/\.0$/,'')}억`};
       const briefMoney=n=>`${Math.round(Number(n||0)/100000000)}억`;
       function moneyDetail(label,value){alert(`${label}\n${won(Number(value||0))} 메소\n(${eok(Number(value||0))})`)}
-      const isHiddenBossCharacterName=name=>{const n=String(name||'').replace(/\s/g,'');return n.includes('총하빙')||n.includes('총합')||n.includes('쌀먹')};
       const isValidNotionId=id=>/^[0-9a-f]{32}$/i.test(String(id||'').replace(/-/g,''));
-      const BOSS_CHAR_ORDER=['숍슈슈','렌슈솜','양슈슈','현라양','썬슈슈','득템'];
-      const BOSS_FAMILY_ORDER=['벨룸','파풀라투스','스우','데미안','가디언 엔젤 슬라임','윌','루시드','더스크','듄켈','진 힐라','선택받은 세렌','감시자 칼로스','최초의 대적자','카링','림보','발드릭스','검은 마법사','매그너스','피에르','반반','블러디 퀸','자쿰','시그너스','핑크빈','힐라'];
-      function bossCharRank(name){const n=String(name||'').trim();const i=BOSS_CHAR_ORDER.findIndex(x=>n.includes(x));return i===-1?999:i}
-      function orderBossChars(list){return [...list].sort((a,b)=>bossCharRank(a.name)-bossCharRank(b.name)||String(a.name||'').localeCompare(String(b.name||''),'ko'))}
-      function familyRankName(name){const n=String(name||'');const i=BOSS_FAMILY_ORDER.findIndex(x=>n.includes(x));return i===-1?999:i}
-      function bossFamilyName(record){return record.family||BOSS_FAMILY_ORDER.find(x=>String(record.name||'').includes(x))||String(record.name||'보스').replace(/^(익스트림|카오스|하드|노멀|이지)\s+/,'').trim()}
-      function bossCycleByName(name){return String(name||'').includes('검은 마법사')?'monthly':'weekly'}
-      function bossChipLabel(c){if(c.id==='all')return '▦';if(String(c.name||'').includes('득템'))return '💍';return c.name}
-      function bossChipTitle(c){if(c.id==='all')return '전체';if(String(c.name||'').includes('득템'))return '득템';return c.name}
 
       function renderDashboard(){
         const todayKey=key(today);
         const todayScheduleList=dashboardTodaySchedules??state.schedules.filter(x=>x.date===todayKey);
-        const todayTodoList=dashboardTodayTodos??state.tasks.filter(x=>x.date===todayKey);
         const todaySchedules=todayScheduleList.length;
-        const todayTasks=todayTodoList.length;
-        const bossDone=bossRecords.filter(x=>x.clear).length;
-        const bossTotal=bossRecords.length;
         const set=(id,text)=>{const el=$(id);if(el)el.innerHTML=text};
-        set('#dashCalendarSummary',`오늘 일정 ${todaySchedules}개 / 할 일 ${todayTasks}개<br>누르면 캘린더로 이동`);
+        set('#dashCalendarSummary',`오늘 일정 ${todaySchedules}개<br>누르면 캘린더로 이동`);
         // 가계부 요약은 실제 오늘 기준 월 데이터만 사용하므로 여기서 덮어쓰지 않음.
-        set('#dashHabitSummary',`오늘 해빗 3개 중 2개 완료<br>대시보드에서 바로 확인`);
-        set('#dashBossSummary',`이번 주 보스 ${bossTotal}개 중 ${bossDone}개 완료<br>누르면 보스 탭으로 이동`);
-        renderDashboardTodayList(todayKey);
-      }
-      function renderDashboardTodayList(todayKey){
-        const list=$('#dashboardTodayList');
-        if(!list)return;
-        const todos=(dashboardTodayTodos??(state.tasks||[]).filter(x=>x.date===todayKey)).sort((a,b)=>Number(a.done)-Number(b.done));
-        if(!todos.length){list.innerHTML='<li><span class="check"></span><span>오늘 날짜의 할 일이 없어요.</span><span class="tag task">비어 있음</span></li>';return;}
-        list.innerHTML=todos.slice(0,8).map(x=>`<li class="${x.done?'todoDoneItem':''}"><button class="check ${x.done?'done':''}" data-todo-id="${x.id||''}" type="button" aria-label="할 일 체크"></button><div class="todoContent"><span class="${x.done?'todoDoneText':''}">${x.title}</span>${x.memo?`<div class="todoMemo">${String(x.memo).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:''}</div>${x.url?`<a class="goLink" href="${x.url}" target="_blank" rel="noopener noreferrer">↗</a>`:''}</li>`).join('');
       }
       async function loadDashboardTodayFromWorker(){
         try{
@@ -1620,12 +1528,10 @@
           const data=await res.json().catch(()=>({}));
           if(!res.ok||data.ok===false)return;
           dashboardTodaySchedules=(data.schedules||[]).filter(x=>x.date).map(x=>({id:x.id,url:x.url,type:'schedule',date:String(x.date).slice(0,10),time:x.time||'',title:x.title||'(제목 없음)',subject:x.category||x.subject||'일정',category:x.category||x.subject||'',color:x.color||scheduleColor(x.category||x.subject),canceled:!!x.canceled,projectIds:x.projectIds||[]}));
-          dashboardTodayTodos=(data.todos||[]).filter(x=>x.date).map(x=>({id:x.id,url:x.url,type:'todo',date:String(x.date).slice(0,10),time:x.time||'',title:x.title||'(제목 없음)',memo:x.memo||'',subject:x.category||'할 일',color:x.color||'task',done:!!x.done,canceled:!!x.canceled,projectIds:x.projectIds||[]})).sort((a,b)=>Number(a.done)-Number(b.done));
           renderDashboard();
-        }catch(err){console.warn('대시보드 오늘 할 일 갱신 실패',err)}
+        }catch(err){console.warn('대시보드 오늘 일정 갱신 실패',err)}
       }
       function page(id,options={}){
-        if(currentViewMode==='work'&&(id==='budget'||id==='boss'))id='dashboard';
         if(!document.getElementById(id))id='dashboard';
         localStorage.setItem(ACTIVE_PAGE_KEY,id);
         $$('.page').forEach(p=>p.classList.toggle('on',p.id===id));
@@ -1633,7 +1539,6 @@
         if(options.scroll!==false)scrollTo({top:0,behavior:'smooth'});
         if(id==='calendar')setTimeout(()=>loadCalendarFromWorker(true),180);
         if(id==='budget')setTimeout(()=>window.paperMoney?.load?.(true),260);
-        if(id==='boss')setTimeout(()=>loadBossFromWorker(true),220);
       }
       function dateStrip(){const root=$('#dateStrip');root.innerHTML='';const mon=new Date(today);mon.setDate(today.getDate()-((today.getDay()+6)%7));for(let i=0;i<7;i++){const d=new Date(mon);d.setDate(mon.getDate()+i);root.insertAdjacentHTML('beforeend',`<div class="pill ${key(d)===key(today)?'on':''} ${isWeekend(d)?'weekend':''} ${isHoliday(d)?'holiday':''}" title="${HOLIDAYS_KR[key(d)]||''}"><strong>${d.getDate()}</strong><span>${wk[d.getDay()]}</span></div>`)}}
       const MOOD_LABELS={happy:'좋음',sad:'슬픔',angry:'화남',sleepy:'졸림',surprised:'놀람'};
@@ -1641,9 +1546,9 @@
       function moodIconHTML(mood,cls=''){const m=moodKey(mood);return m?`<img class="moodIcon ${cls}" src="./icons/mood-${m}.png" alt="${MOOD_LABELS[m]||m}">`:''}
       function moodBgAttr(mood){const m=moodKey(mood);return m?` style="--mood-bg:url('./icons/mood-${m}.png')"`:''}
 
-      function visible(k){return{schedule:state.show.schedule?state.schedules.filter(x=>x.date===k):[],todo:state.show.todo?state.tasks.filter(x=>x.date===k):[],daily:state.dailyLogs?state.dailyLogs.filter(x=>x.date===k):[]}}
+      function visible(k){return{schedule:state.show.schedule?state.schedules.filter(x=>x.date===k):[]}}
       function scheduleColor(subject){if(subject==='취소')return 'canceled';if(subject==='약속')return 'meeting';if(subject==='개인일정')return 'personal';return 'work'}
-      function calendarMarkers(v){const markers=[];v.schedule.forEach(x=>markers.push(scheduleColor(x.subject)));if(v.todo.length)markers.push('task');return markers.slice(0,4)}
+      function calendarMarkers(v){const markers=[];v.schedule.forEach(x=>markers.push(scheduleColor(x.subject)));return markers.slice(0,4)}
       function monthRange(){const from=new Date(view.getFullYear(),view.getMonth(),1),to=new Date(view.getFullYear(),view.getMonth()+1,0);return{from:key(from),to:key(to)}}
       const CALENDAR_CACHE_KEY='paperlog_calendar_cache_v3';
       let calendarLoadSeq=0, projectsLoadedOnce=false;
@@ -1654,15 +1559,15 @@
         todos:uniqueByIdDate((data.todos||[]).filter(x=>x.date).map(x=>({id:x.id,url:x.url,type:'todo',date:String(x.date).slice(0,10),time:x.time||'',title:x.title||'(제목 없음)',memo:x.memo||'',subject:x.category||'할 일',color:x.color||'task',done:!!x.done,canceled:!!x.canceled,projectIds:x.projectIds||[]}))).sort((a,b)=>Number(a.done)-Number(b.done)),
         dailyLogs:uniqueByIdDate((data.dailyLogs||[]).filter(x=>x.date).map(x=>({id:x.id,url:x.url,type:'daily',date:String(x.date).slice(0,10),title:x.title||'하루 기록',mood:x.mood||'',text:x.text||''})))
       }}
-      function setCalendarState(data){state.schedules=data.schedules||[];state.tasks=data.todos||[];state.dailyLogs=data.dailyLogs||[]}
+      function setCalendarState(data){state.schedules=data.schedules||[]}
       function applyCalendarData(data,month=calendarMonthKey()){const normalized=normalizeCalendarData(data);setCalendarState(normalized);saveCalendarMonthCache(month,normalized);renderCal();renderDashboard()}
       function getCalendarCacheStore(){try{return JSON.parse(localStorage.getItem(CALENDAR_CACHE_KEY)||'{}')}catch{return {}}}
       function setCalendarCacheStore(store){try{localStorage.setItem(CALENDAR_CACHE_KEY,JSON.stringify(store||{}))}catch(err){console.warn('캘린더 캐시 저장 실패:',err)}}
-      function saveCalendarMonthCache(month,data){const store=getCalendarCacheStore();store[month]={savedAt:Date.now(),schedules:data.schedules||[],todos:data.todos||[],dailyLogs:data.dailyLogs||[]};store.projects=projectOptions||store.projects||[];setCalendarCacheStore(store)}
-      function restoreCalendarMonthCache(month=calendarMonthKey()){try{const store=getCalendarCacheStore();const cached=store[month];if(!cached)return false;setCalendarState({schedules:cached.schedules||[],todos:cached.todos||[],dailyLogs:cached.dailyLogs||[]});projectOptions=Array.isArray(store.projects)?store.projects:projectOptions;populateProjectSelect();renderCal();renderDashboard();return true}catch(err){console.warn('캘린더 월 캐시 복구 실패:',err);return false}}
-      function saveCalendarCache(){saveCalendarMonthCache(calendarMonthKey(),{schedules:state.schedules||[],todos:state.tasks||[],dailyLogs:state.dailyLogs||[]})}
+      function saveCalendarMonthCache(month,data){const store=getCalendarCacheStore();store[month]={savedAt:Date.now(),schedules:data.schedules||[]};store.projects=projectOptions||store.projects||[];setCalendarCacheStore(store)}
+      function restoreCalendarMonthCache(month=calendarMonthKey()){try{const store=getCalendarCacheStore();const cached=store[month];if(!cached)return false;setCalendarState({schedules:cached.schedules||[]});projectOptions=Array.isArray(store.projects)?store.projects:projectOptions;populateProjectSelect();renderCal();renderDashboard();return true}catch(err){console.warn('캘린더 월 캐시 복구 실패:',err);return false}}
+      function saveCalendarCache(){saveCalendarMonthCache(calendarMonthKey(),{schedules:state.schedules||[]})}
       function restoreCalendarCache(){return restoreCalendarMonthCache(calendarMonthKey())}
-      function clearCalendarForMonth(){state.schedules=[];state.tasks=[];state.dailyLogs=[];renderCal();renderDashboard()}
+      function clearCalendarForMonth(){state.schedules=[];renderCal();renderDashboard()}
       function populateProjectSelect(){const sel=$('#entryProject');if(!sel)return;const current=sel.value;sel.innerHTML='<option value="">선택 안 함</option>'+projectOptions.map(p=>`<option value="${p.id}">${p.title||'제목 없음'}</option>`).join('');if(current&&projectOptions.some(p=>p.id===current))sel.value=current}
       function selectPersonalProject(){
         const sel=$('#entryProject');
@@ -1681,7 +1586,7 @@
         if(kind==='personal')selectPersonalProject();
       }
       async function loadProjectsFromWorker(silent=true){try{if(!hasPaperConfig())return;const res=await window.paperLog.fetch('/api/projects');const data=await res.json().catch(()=>({}));if(!res.ok||data.ok===false)throw new Error(data.message||data.error||'프로젝트 불러오기 실패');projectOptions=data.projects||[];projectsLoadedOnce=true;populateProjectSelect();const store=getCalendarCacheStore();store.projects=projectOptions;setCalendarCacheStore(store);saveCalendarCache()}catch(err){if(!silent){const s=$('#settingsStatus');if(s)s.textContent='프로젝트 불러오기 실패: '+err.message}console.warn('프로젝트 불러오기 실패:',err)}}
-      async function loadCalendarFromWorker(silent=false){const status=$('#syncStatus'), settingsStatus=$('#settingsStatus'), seq=++calendarLoadSeq, month=calendarMonthKey();try{if(!hasPaperConfig()){if(status)status.textContent='설정 메뉴에서 Worker 주소와 SECRET Key를 먼저 저장해 주세요.';openSettings();return}if(status&&!silent)status.textContent='Notion에서 일정/할 일을 불러오는 중...';if(settingsStatus)settingsStatus.textContent='Notion에서 현재 월 데이터를 불러오는 중...';if(!projectsLoadedOnce&&!projectOptions.length)loadProjectsFromWorker(true);const r=monthRange();const qs=new URLSearchParams({from:r.from,to:r.to,includeCanceled:String(state.showCanceled)});const res=await window.paperLog.fetch(`/api/calendar?${qs.toString()}`);const data=await res.json().catch(()=>({}));if(seq!==calendarLoadSeq)return;if(!res.ok||data.ok===false)throw new Error(data.message||data.error||'Worker 응답 오류');applyCalendarData(data,month);loadDashboardTodayFromWorker();if(status)status.textContent=`Notion 불러오기 완료 · 일정 ${state.schedules.length}개 / 할 일 ${state.tasks.length}개`;if(settingsStatus)settingsStatus.textContent='불러오기 완료'}catch(err){if(seq!==calendarLoadSeq)return;if(status)status.textContent=`불러오기 실패: ${err.message}`;if(settingsStatus)settingsStatus.textContent=`불러오기 실패: ${err.message}`}}
+      async function loadCalendarFromWorker(silent=false){const status=$('#syncStatus'), settingsStatus=$('#settingsStatus'), seq=++calendarLoadSeq, month=calendarMonthKey();try{if(!hasPaperConfig()){if(status)status.textContent='설정 메뉴에서 Worker 주소와 SECRET Key를 먼저 저장해 주세요.';openSettings();return}if(status&&!silent)status.textContent='Notion에서 일정을 불러오는 중...';if(settingsStatus)settingsStatus.textContent='Notion에서 일정 데이터를 불러오는 중...';if(!projectsLoadedOnce&&!projectOptions.length)loadProjectsFromWorker(true);const r=monthRange();const qs=new URLSearchParams({from:r.from,to:r.to,includeCanceled:String(state.showCanceled)});const res=await window.paperLog.fetch(`/api/calendar?${qs.toString()}`);const data=await res.json().catch(()=>({}));if(seq!==calendarLoadSeq)return;if(!res.ok||data.ok===false)throw new Error(data.message||data.error||'Worker 응답 오류');applyCalendarData(data,month);loadDashboardTodayFromWorker();if(status)status.textContent=`동기화 완료 · 일정 ${state.schedules.length}개`;if(settingsStatus)settingsStatus.textContent='불러오기 완료'}catch(err){if(seq!==calendarLoadSeq)return;if(status)status.textContent=`불러오기 실패: ${err.message}`;if(settingsStatus)settingsStatus.textContent=`불러오기 실패: ${err.message}`}}
       function parseMemoTagsFromText(value){return String(value||'').split(/[,,，\n]/).map(x=>x.trim()).filter(Boolean);}
       function isAppointmentCategory(value){return String(value||'').trim().includes('약속');}
       function updateAppointmentTargetVisibility(){const form=$('#entryForm');if(!form)return;form.classList.toggle('appointmentSel',Boolean($('#addSchedule')?.checked&&isAppointmentCategory($('#entrySubject')?.value||'')));}
@@ -1741,23 +1646,17 @@
           alert(`Notion 저장 실패: ${err.message}`);
         }
       }
-      function renderCal(){const grid=$('#calendarGrid'), title=$('#monthTitle');grid.innerHTML='';title.textContent=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(view);wkMon.forEach(x=>grid.insertAdjacentHTML('beforeend',`<div class="wd ${x==='sat'||x==='sun'?'weekend':''}">${x}</div>`));const first=new Date(view.getFullYear(),view.getMonth(),1), start=new Date(first);start.setDate(first.getDate()-((first.getDay()+6)%7));for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=key(d),v=visible(k),markers=calendarMarkers(v);grid.insertAdjacentHTML('beforeend',`<button class="day ${d.getMonth()!==view.getMonth()?'mute':''} ${k===key(today)?'today':''} ${k===selected?'sel':''} ${isWeekend(d)?'weekend':''} ${isHoliday(d)?'holiday':''} ${v.daily&&v.daily[0]?'hasMoodBg':''}" data-date="${k}" title="${HOLIDAYS_KR[k]||''}"${(v.daily&&v.daily[0])?moodBgAttr(v.daily[0].mood):''}><span class="num">${d.getDate()}</span><div class="dots">${markers.map(m=>`<span class="dot ${m}"></span>`).join('')}</div></button>`)}
-                           
-                           renderDetail()}
+      function renderCal(){const grid=$('#calendarGrid'), title=$('#monthTitle');grid.innerHTML='';title.textContent=new Intl.DateTimeFormat('en-US',{month:'long',year:'numeric'}).format(view);wkMon.forEach(x=>grid.insertAdjacentHTML('beforeend',`<div class="wd ${x==='sat'||x==='sun'?'weekend':''}">${x}</div>`));const first=new Date(view.getFullYear(),view.getMonth(),1), start=new Date(first);start.setDate(first.getDate()-((first.getDay()+6)%7));for(let i=0;i<42;i++){const d=new Date(start);d.setDate(start.getDate()+i);const k=key(d),v=visible(k),markers=calendarMarkers(v);grid.insertAdjacentHTML('beforeend',`<button class="day ${d.getMonth()!==view.getMonth()?'mute':''} ${k===key(today)?'today':''} ${k===selected?'sel':''} ${isWeekend(d)?'weekend':''} ${isHoliday(d)?'holiday':''}" data-date="${k}" title="${HOLIDAYS_KR[k]||''}"><span class="num">${d.getDate()}</span><div class="dots">${markers.map(m=>`<span class="dot ${m}"></span>`).join('')}</div></button>`)}
+      renderDetail()}
       function isTabletLayout(){return window.matchMedia('(min-width:960px)').matches}
       function scheduleRows(list){return list.map(x=>`<div class="scheduleItem" data-calendar-edit="${x.id||''}" data-calendar-type="schedule"><span class="time ${x.time?'':'empty'}">${x.time||'종일'}</span><span>${x.title} <span class="tag ${x.color||scheduleColor(x.subject)}">${x.subject||'일정'}</span></span>${x.url?`<a class="goLink" href="${x.url}" target="_blank" rel="noopener noreferrer">↗</a>`:`<span class="goLink disabled">↗</span>`}</div>`).join('')}
-      function todoRows(list){return list.map(x=>`<li class="${x.done?'todoDoneItem':''}" data-calendar-edit="${x.id||''}" data-calendar-type="todo"><button class="check ${x.done?'done':''}" data-todo-id="${x.id||''}" data-todo-done="${x.done?'true':'false'}" type="button" aria-label="할 일 체크"></button><div class="todoContent"><span class="${x.done?'todoDoneText':''}">${x.title}</span>${x.memo?`<div class="todoMemo">${String(x.memo).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`:''}</div>${x.url?`<a class="goLink" href="${x.url}" target="_blank" rel="noopener noreferrer">↗</a>`:`<span class="goLink disabled">↗</span>`}</li>`).join('')}
       function renderDetail(){
         const box=$('#calendarDetail'), d=new Date(selected+'T00:00:00'), v=visible(selected);
-        const sortedTodos=[...(v.todo||[])].sort((a,b)=>Number(a.done)-Number(b.done));
-        const dailyRows=(v.daily||[]).map(x=>`<div class="dailyLogBox" data-calendar-edit="${x.id||''}" data-calendar-type="daily">${moodIconHTML(x.mood)}<div class="dailyLogText">${x.text||'한줄 일기가 비어 있어요.'}</div></div>`).join('');
-        const dailyBlock=`<div class="dailyLogGroup"><div class="dailyLogHead"><span class="dailyLogTitle">Daily Log</span><button class="dailyAddBtn" type="button" data-daily-add="${selected}" aria-label="하루 기록 추가">＋</button></div>${dailyRows?`<div class="dailyLogItems">${dailyRows}</div>`:''}</div>`;
-        const showScheduleInline=isTabletLayout();
-        if(!v.schedule.length&&!sortedTodos.length&&!dailyRows){
-          box.innerHTML=`<h4>${d.getMonth()+1}/${d.getDate()} ${wk[d.getDay()]}</h4>${dailyBlock}<p class="empty-msg">선택한 항목에는 아직 기록이 없어요.</p>`;
+        if(!v.schedule.length){
+          box.innerHTML=`<h4>${d.getMonth()+1}/${d.getDate()} ${wk[d.getDay()]}</h4><p class="empty-msg" style="color:var(--sub);font-family:'Gaegu';font-size:17px">이 날은 등록된 일정이 없어요.</p>`;
           return;
         }
-        box.innerHTML=`<h4>${d.getMonth()+1}/${d.getDate()} ${wk[d.getDay()]}</h4>${dailyBlock}${(showScheduleInline&&v.schedule.length)?`<div class="group"><p class="groupT"><span class="blue">일정</span></p>${scheduleRows(v.schedule)}</div>`:''}${sortedTodos.length?`<div class="group"><p class="groupT"><span class="green">할 일</span></p><ul class="list">${todoRows(sortedTodos)}</ul></div>`:(!showScheduleInline?`<p class="empty-msg">할 일은 아직 없어요.</p>`:'')}`;
+        box.innerHTML=`<h4>${d.getMonth()+1}/${d.getDate()} ${wk[d.getDay()]}</h4><div class="group">${scheduleRows(v.schedule)}</div>`;
       }
       function showSchedulePopup(dateKeyValue,anchorEl){
         if(isTabletLayout())return;
@@ -1890,7 +1789,6 @@
         hideSchedulePopup();
       }
       function openCalendarEdit(type,id){
-        if(type==='daily'){openDailyEdit(id);return;}
         const item=(type==='schedule'?state.schedules:state.tasks).find(x=>x.id===id);
         if(!item)return;
         editingCalendarRecord={type,id,item};
@@ -1915,78 +1813,6 @@
         $('#entrySheet').hidden=false;
         hideSchedulePopup();
       }
-      function openDailyEntry(dateValue=selected){
-        editingDailyRecord=null;
-        $('#dailySheetTitle')&&($('#dailySheetTitle').textContent='Daily Log 추가');
-        $('#deleteDailyLog')&&($('#deleteDailyLog').hidden=true);
-        $('#dailyDate')&&($('#dailyDate').value=dateValue||selected||key(today));
-        $('#dailyMood')&&($('#dailyMood').value='happy');
-        $('#dailyText')&&($('#dailyText').value='');
-        $('#dailyStatus')&&($('#dailyStatus').textContent='선택한 날짜에 mood와 한줄 일기를 저장해요.');
-        $('#dailySheet')&&($('#dailySheet').hidden=false);
-        hideSchedulePopup();
-      }
-      function openDailyEdit(id){
-        const item=(state.dailyLogs||[]).find(x=>x.id===id);
-        if(!item)return;
-        editingDailyRecord=item;
-        $('#dailySheetTitle')&&($('#dailySheetTitle').textContent='Daily Log 수정');
-        $('#deleteDailyLog')&&($('#deleteDailyLog').hidden=false);
-        $('#dailyDate')&&($('#dailyDate').value=item.date||selected||key(today));
-        $('#dailyMood')&&($('#dailyMood').value=moodKey(item.mood)||'happy');
-        $('#dailyText')&&($('#dailyText').value=item.text||'');
-        $('#dailyStatus')&&($('#dailyStatus').textContent='수정 후 Notion에 반영됩니다.');
-        $('#dailySheet')&&($('#dailySheet').hidden=false);
-        hideSchedulePopup();
-      }
-      function closeDailySheet(){
-        editingDailyRecord=null;
-        $('#dailySheet')&&($('#dailySheet').hidden=true);
-      }
-      async function saveDailyLog(e){
-        e.preventDefault();
-        const date=$('#dailyDate')?.value||selected;
-        const mood=$('#dailyMood')?.value||'happy';
-        const textValue=$('#dailyText')?.value.trim()||'';
-        if(!date)return;
-        const title=`${date} 하루 기록`;
-        try{
-          const path='/api/daily';
-          const method=editingDailyRecord?'PATCH':'POST';
-          const body=editingDailyRecord
-            ? {id:editingDailyRecord.id,title,date,mood,text:textValue}
-            : {title,date,mood,text:textValue};
-          const res=await window.paperLog.fetch(path,{method,body:JSON.stringify(body)});
-          const data=await res.json().catch(()=>({}));
-          if(!res.ok||data.ok===false)throw new Error(data.message||data.error||(editingDailyRecord?'수정 실패':'저장 실패'));
-          selected=date;
-          view=new Date(+date.slice(0,4),+date.slice(5,7)-1,1);
-          closeDailySheet();
-          await loadCalendarFromWorker(true);
-          renderDashboard();
-          const status=$('#syncStatus');if(status)status.textContent=editingDailyRecord?'Daily Log를 수정했어요.':'Daily Log를 저장했어요.';
-        }catch(err){
-          const s=$('#dailyStatus');if(s)s.textContent='저장 실패: '+err.message;
-          console.warn(err);
-        }
-      }
-      async function deleteDailyLog(){
-        if(!editingDailyRecord?.id)return;
-        if(!confirm('이 Daily Log를 삭제할까요?\nNotion에서는 휴지통/보관 처리됩니다.'))return;
-        try{
-          const res=await window.paperLog.fetch('/api/daily',{method:'DELETE',body:JSON.stringify({id:editingDailyRecord.id})});
-          const data=await res.json().catch(()=>({}));
-          if(!res.ok||data.ok===false)throw new Error(data.message||data.error||'삭제 실패');
-          closeDailySheet();
-          await loadCalendarFromWorker(true);
-          renderDashboard();
-          const status=$('#syncStatus');if(status)status.textContent='Daily Log를 삭제했어요.';
-        }catch(err){
-          const s=$('#dailyStatus');if(s)s.textContent='삭제 실패: '+err.message;
-          console.warn(err);
-        }
-      }
-
       async function deleteCalendarEntry(){
         if(!editingCalendarRecord?.id)return;
         const item=editingCalendarRecord.item||{};
@@ -2080,9 +1906,11 @@
         const total=crystalValue(r);
         return `<div class="bossChip ${r.clear?'clear':''}"><button class="check ${r.clear?'done':''}" data-bosskey="${r.key}" type="button" aria-label="보스 격파 체크"></button><span class="bossChipName" data-bossloot="${r.key}" title="득템 메모 추가">${r.name}</span><select class="partyMode" data-partykey="${r.key}"><option value="solo" ${r.partyType==='solo'?'selected':''}>1인</option><option value="duo" ${r.partyType==='duo'?'selected':''}>2인</option><option value="other" ${r.partyType==='other'?'selected':''}>기타</option></select>${r.partyType==='other'?`<select class="otherParty" data-otherpartykey="${r.key}">${[3,4,5,6].map(n=>`<option value="${n}" ${Number(r.otherParty||3)===n?'selected':''}>${n}인</option>`).join('')}</select>`:''}<span class="price">${won(total)}</span><button class="bossDelete" data-deleteboss="${r.key}" type="button" aria-label="보스 삭제">×</button></div>`;
       }
+      function sortBossRowsByCrystal(records){return [...records].sort((a,b)=>crystalValue(a)-crystalValue(b)||String(a.name||'').localeCompare(String(b.name||''),'ko'))}
       function renderBossBucket(label,type,records){
         if(!records.length)return '';
-        return `<div class="bossBucket"><div class="bossBucketTitle"><span>${label}</span></div>${records.map(renderBossChip).join('')}</div>`;
+        const sorted=sortBossRowsByCrystal(records);
+        return `<div class="bossBucket"><div class="bossBucketTitle"><span>${label}</span></div>${sorted.map(renderBossChip).join('')}</div>`;
       }
       function renderBoss(){
         updateBossWeekTitle();
@@ -2109,7 +1937,7 @@
           const other=rs.filter(r=>r.partyType==='other');
           const checkedSum=rs.filter(r=>r.clear).reduce((a,b)=>a+crystalValue(b),0);
           const expectedSum=rs.filter(r=>!r.clear).reduce((a,b)=>a+crystalValue(b),0);
-          return `<div class="bossCard"><div class="bossTitle"><span>${chars.find(c=>c.id===cid)?.name||rs[0]?.charName||'캐릭터'}</span><span class="tag y">예정 ${won(expectedSum)} · 결정석 ${won(checkedSum)}</span></div>${renderBossBucket('1인 파티','solo',solo)}${renderBossBucket('2인 파티','duo',duo)}${renderBossBucket('기타 인원','other',other)}${renderLootBucket(cid)}</div>`;
+          return `<div class="bossCard"><div class="bossTitle"><span>${chars.find(c=>c.id===cid)?.name||rs[0]?.charName||'캐릭터'}</span><span class="tag y">예정 ${won(expectedSum)} · 결정석 ${won(checkedSum)}</span></div>${renderLootBucket(cid)}${renderBossBucket('1인 파티','solo',solo)}${renderBossBucket('2인 파티','duo',duo)}${renderBossBucket('기타 인원','other',other)}</div>`;
         }).join('');
       }
       function openBossLootMemo(keyValue){
@@ -2240,7 +2068,7 @@
             if(!chars.some(c=>c.id===bossFilter))bossFilter='all';
           }
           if(Array.isArray(data.crystals)&&data.crystals.length){
-            bosses.splice(0,bosses.length,...data.crystals.map(c=>({id:c.id,name:c.name,family:c.family||bossFamilyName(c),cycle:c.cycle||bossCycleByName(c.name),price:Number(c.price||0),source:'notion'})));
+            bosses.splice(0,bosses.length,...data.crystals.filter(c=>!String(c.name||'').includes('키링')&&!String(c.family||'').includes('키링')).map(c=>({id:c.id,name:c.name,family:bossFamilyName(c)||c.family||'보스',cycle:c.cycle||bossCycleByName(c.name),price:Number(c.price||0),source:'notion'})));
           }
           Object.keys(bossSet).forEach(k=>delete bossSet[k]);
           if(Array.isArray(data.setups)){
@@ -2450,12 +2278,12 @@
         const checked=$$('#bossSettingGrid input[type="checkbox"][data-family]:checked').map(x=>x.value);
         if($('#bossSettingGrid input[type="checkbox"][data-family]')) bossSet[charId]=checked;
       }
-      function renderBossGrid(){const cid=bossSettingActiveCharId||$('#bossCharSelect').value||$('#bossCharSelect option')?.value||'', cur=bossSet[cid]||[];const lowFamilies=['매그너스','피에르','반반','블러디 퀸','자쿰','시그너스','핑크빈','힐라'];const familyRank=family=>familyRankName(family);const grouped=bosses.reduce((acc,b)=>{(acc[b.family]??=[]).push(b);return acc},{});const diffName=b=>b.name.replace(b.family,'').trim()||b.name;const familyCard=([family,items])=>`<div class="bossFamily"><div class="bossFamilyTitle"><span>${family}</span><span class="miniTag">${items[0].cycle==='monthly'?'월간':'주간'}${items.some(x=>x.exception)?' · 예외':''}</span></div><div class="bossVariantRow">${[...items].sort((a,b)=>a.price-b.price).map(b=>`<label class="bossVariant"><input type="checkbox" value="${b.id}" data-family="${family}" ${cur.includes(b.id)?'checked':''}><span class="bossVariantDiff">${diffName(b)}</span><span class="bossVariantPrice">(${eok(b.price)})</span></label>`).join('')}</div></div>`;const entries=Object.entries(grouped).sort((a,b)=>familyRank(a[0])-familyRank(b[0]));const main=entries.filter(([family])=>!lowFamilies.includes(family)).map(familyCard).join('');const low=entries.filter(([family])=>lowFamilies.includes(family)).map(familyCard).join('');$('#bossSettingGrid').innerHTML=`${main}<button class="lowBossToggle" id="toggleLowBoss" type="button"><span>벨룸 미만 보스</span><span>${showLowBosses?'접기 ▲':'펼치기 ▼'}</span></button><div class="lowBossWrap" ${showLowBosses?'':'hidden'}>${low}</div>`;renderBossSettingSummary()}
+      function renderBossGrid(){const cid=bossSettingActiveCharId||$('#bossCharSelect').value||$('#bossCharSelect option')?.value||'', cur=bossSet[cid]||[];const lowFamilies=['매그너스','피에르','반반','블러디 퀸','자쿰','시그너스','핑크빈','힐라'];const familyRank=family=>familyRankName(family);const grouped=bosses.reduce((acc,b)=>{(acc[b.family]??=[]).push(b);return acc},{});const diffName=b=>b.name.replace(b.family,'').trim()||b.name;const familyCard=([family,items])=>`<div class="bossFamily"><div class="bossFamilyTitle"><span>${family}</span><span class="miniTag">${items[0].cycle==='monthly'?'월간':'주간'}${items.some(x=>x.exception)?' · 예외':''}</span></div><div class="bossVariantRow">${[...items].sort((a,b)=>bossDifficultyRank(a.name)-bossDifficultyRank(b.name)||a.price-b.price).map(b=>`<label class="bossVariant"><input type="checkbox" value="${b.id}" data-family="${family}" ${cur.includes(b.id)?'checked':''}><span class="bossVariantDiff">${diffName(b)}</span><span class="bossVariantPrice">(${eok(b.price)})</span></label>`).join('')}</div></div>`;const entries=Object.entries(grouped).sort((a,b)=>familyRank(a[0])-familyRank(b[0]));const main=entries.filter(([family])=>!lowFamilies.includes(family)).map(familyCard).join('');const low=entries.filter(([family])=>lowFamilies.includes(family)).map(familyCard).join('');$('#bossSettingGrid').innerHTML=`${main}<button class="lowBossToggle" id="toggleLowBoss" type="button"><span>벨룸 미만 보스</span><span>${showLowBosses?'접기 ▲':'펼치기 ▼'}</span></button><div class="lowBossWrap" ${showLowBosses?'':'hidden'}>${low}</div>`;renderBossSettingSummary()}
       function renderBossSettingSummary(){const box=$('#bossSettingSummary');if(!box)return;const checked=$$('#bossSettingGrid input[data-family]:checked').map(input=>bosses.find(b=>b.id===input.value)).filter(Boolean);const weeklyCount=checked.filter(b=>b.cycle==='weekly').length;const monthlyCount=checked.filter(b=>b.cycle==='monthly').length;box.innerHTML=`<div class="bossSettingSummaryHead"><span>선택한 기본 보스</span><strong>${checked.length}개</strong></div><div class="bossSettingSummaryList">${checked.length?checked.map(b=>`<span class="miniTag">${b.name}</span>`).join(''):'<span class="muted">아직 선택한 보스가 없어요.</span>'}</div><p class="sheetNote">주간 ${weeklyCount}개 / 월간 ${monthlyCount}개</p>`}
       function openSettings(){fillSettingsForm();populateProjectSelect();loadProjectsFromWorker(true);$('#settingsSheet').hidden=false}
       function closeSettings(){const s=$('#settingsSheet');if(s)s.hidden=true}
-      function fillSettingsForm(){const cfg=getPaperConfig();const workerName=$('#settingWorkerName'),workerId=$('#settingWorkerId'),secret=$('#settingSecretKey'),remember=$('#settingRememberSecret'),viewMode=$('#settingViewMode');if(workerName)workerName.value=cfg.workerName||'';if(workerId)workerId.value=cfg.workerId||'';if(secret)secret.value=cfg.secretKey||'';if(remember)remember.checked=Boolean(localStorage.getItem(PAPER_SECRET_KEY)||cfg.secretKey);if(viewMode)viewMode.value=currentViewMode}
-      function saveSettingsForm(e){e.preventDefault();const cfg={workerName:$('#settingWorkerName').value.trim(),workerId:$('#settingWorkerId').value.trim(),secretKey:$('#settingSecretKey').value.trim()};const status=$('#settingsStatus');if(!cfg.workerName||!cfg.workerId||!cfg.secretKey){if(status)status.textContent='Worker 앞부분, Cloudflare ID, SECRET Key를 모두 입력해 주세요.';return}if(!/^[a-zA-Z0-9-]+$/.test(cfg.workerName)||!/^[a-zA-Z0-9-]+$/.test(cfg.workerId)){if(status)status.textContent='Worker 앞부분과 Cloudflare ID는 영문, 숫자, 하이픈만 입력해 주세요.';return}setPaperConfig(cfg,$('#settingRememberSecret')?.checked!==false);if(status)status.textContent='설정을 저장했어요. Notion을 불러옵니다.';loadCalendarFromWorker(false)}
+      function fillSettingsForm(){const cfg=getPaperConfig();const workerName=$('#settingWorkerName'),workerId=$('#settingWorkerId'),secret=$('#settingSecretKey'),remember=$('#settingRememberSecret');if(workerName)workerName.value=cfg.workerName||'';if(workerId)workerId.value=cfg.workerId||'';if(secret)secret.value=cfg.secretKey||'';if(remember)remember.checked=Boolean(localStorage.getItem(PAPER_SECRET_KEY)||cfg.secretKey)}
+      async function saveSettingsForm(e){e.preventDefault();const cfg={workerName:$('#settingWorkerName').value.trim(),workerId:$('#settingWorkerId').value.trim(),secretKey:$('#settingSecretKey').value.trim()};const status=$('#settingsStatus');if(!cfg.workerName||!cfg.workerId||!cfg.secretKey){if(status)status.textContent='Worker 앞부분, Cloudflare ID, SECRET Key를 모두 입력해 주세요.';return}if(!/^[a-zA-Z0-9-]+$/.test(cfg.workerName)||!/^[a-zA-Z0-9-]+$/.test(cfg.workerId)){if(status)status.textContent='Worker 앞부분과 Cloudflare ID는 영문, 숫자, 하이픈만 입력해 주세요.';return}setPaperConfig(cfg,$('#settingRememberSecret')?.checked!==false);if(status)status.textContent='설정을 저장했어요. Notion을 불러옵니다...';await loadCalendarFromWorker(false);if((status?.textContent||'').includes('완료'))closeSettings()}
       async function toggleTodoCheck(todoId){const tasks=state.tasks.filter(x=>x.id===todoId);if(!tasks.length)return;const prev=!!tasks[0].done,next=!prev;tasks.forEach(t=>t.done=next);renderCal();renderDashboard();saveCalendarCache();try{const res=await window.paperLog.fetch('/api/todo/check',{method:'PATCH',body:JSON.stringify({id:todoId,done:next})});const data=await res.json().catch(()=>({}));if(!res.ok||data.ok===false)throw new Error(data.message||data.error||'체크 저장 실패');const status=$('#syncStatus');if(status)status.textContent='체크 상태를 Notion에 반영했어요.';setTimeout(()=>loadCalendarFromWorker(true),500)}catch(err){tasks.forEach(t=>t.done=prev);renderCal();renderDashboard();saveCalendarCache();alert('Notion 체크 반영 실패: '+err.message)}}
       function applyWeekStripHidden(){document.body.classList.toggle('weekStripHidden',localStorage.getItem('paperWeekStripHidden')==='true')}
       function toggleWeekStrip(){const next=!(localStorage.getItem('paperWeekStripHidden')==='true');localStorage.setItem('paperWeekStripHidden',String(next));applyWeekStripHidden()}
@@ -2477,21 +2305,11 @@
         setTimeout(()=>loadCalendarFromWorker(true),60);
         document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});
       }
-      $('#calendarGrid').onclick=e=>{const d=e.target.closest('.day');if(d){const picked=d.dataset.date;selected=picked;renderCal();if(!isTabletLayout()){const liveDay=$(`#calendarGrid .day[data-date="${picked}"]`);showSchedulePopup(picked,liveDay)}}};$('#monthTitle')?.addEventListener('click',()=>{document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});});$('#prevMonth').onclick=()=>moveCalendarMonth(-1);$('#nextMonth').onclick=()=>moveCalendarMonth(1);$('#calendarTodayBtn')&&($('#calendarTodayBtn').onclick=goCalendarToday);$$('.tab[data-type]').forEach(t=>t.onclick=()=>{const type=t.dataset.type,on=Object.values(state.show).filter(Boolean).length;if(state.show[type]&&on===1)return;state.show[type]=!state.show[type];t.classList.toggle('on',state.show[type]);renderCal()});$('#openEntry').onclick=openEntry;$('#closeEntry').onclick=()=>{editingCalendarRecord=null;$('#entrySheet').hidden=true;};$('#closeDailyLog')&&( $('#closeDailyLog').onclick=closeDailySheet );$('#dailyForm')&&($('#dailyForm').onsubmit=saveDailyLog);$('#deleteDailyLog')?.addEventListener('click',deleteDailyLog);$('#deleteEntry')?.addEventListener('click',deleteCalendarEntry);$('#addSchedule').onchange=updateEntryMode;$('#addTodo').onchange=()=>{updateEntryMode();handleTodoKindChange()};$('#addDaily').onchange=updateEntryMode;$('#entryDone')&&($('#entryDone').onchange=handleTodoKindChange);$('#entryForm').onsubmit=saveEntry;$('#entrySubject')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();const el=e.currentTarget;const start=el.selectionStart??el.value.length,end=el.selectionEnd??el.value.length;el.value=el.value.slice(0,start)+'\n'+el.value.slice(end);el.selectionStart=el.selectionEnd=start+1;}});$('#calendarDetail').addEventListener('click',e=>{if(e.target.closest('a'))return;const addDaily=e.target.closest('[data-daily-add]');if(addDaily){openDailyEntry(addDaily.dataset.dailyAdd||selected);return}const btn=e.target.closest('[data-todo-id]');if(btn&&btn.dataset.todoId){toggleTodoCheck(btn.dataset.todoId);return}const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit){openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit);return}const open=e.target.closest('[data-open-schedule-popup]');if(open){const dayEl=$(`#calendarGrid .day[data-date="${selected}"]`);showSchedulePopup(selected,dayEl)}});const dashList=$('#dashboardTodayList');if(dashList)dashList.addEventListener('click',e=>{const btn=e.target.closest('[data-todo-id]');if(btn&&btn.dataset.todoId)toggleTodoCheck(btn.dataset.todoId)});const schedulePopupBg=$('#schedulePopupBg');if(schedulePopupBg)schedulePopupBg.addEventListener('click',e=>{if(e.target===schedulePopupBg)hideSchedulePopup()});const schedulePopupClose=$('#schedulePopupClose');if(schedulePopupClose)schedulePopupClose.onclick=hideSchedulePopup;const schedulePopupContent=$('#schedulePopupContent');if(schedulePopupContent)schedulePopupContent.addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit)openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit)});document.addEventListener('click',e=>{const bg=$('#schedulePopupBg');if(!bg||bg.hidden||isTabletLayout())return;if(e.target.closest('#schedulePopup')||e.target.closest('.day')||e.target.closest('[data-open-schedule-popup]'))return;hideSchedulePopup()});$$('.moneyTab').forEach(t=>t.onclick=()=>{$$('.moneyTab').forEach(x=>x.classList.toggle('on',x===t));$('#expenseForm').classList.toggle('on',t.dataset.type==='expense');$('#incomeForm').classList.toggle('on',t.dataset.type==='income')});$('#generateBoss').onclick=generateBoss;$('#loadBossNotion')&&($('#loadBossNotion').onclick=()=>loadBossFromWorker(false));$('#bossPrevWeek')&&($('#bossPrevWeek').onclick=()=>moveBossWeek(-1));$('#bossNextWeek')&&($('#bossNextWeek').onclick=()=>moveBossWeek(1));$('#bossTodayWeek')&&($('#bossTodayWeek').onclick=resetBossWeekToToday);$('#openBossSetting').onclick=()=>openBossSheet();$('#closeBoss').onclick=()=>{preserveBossGridSelection();saveBossSettingForChar(bossSettingActiveCharId,{silent:true});$('#bossSheet').hidden=true;};$('#cancelBoss').onclick=()=>{preserveBossGridSelection();saveBossSettingForChar(bossSettingActiveCharId,{silent:true});$('#bossSheet').hidden=true;};$('#bossRuleHelp')&&($('#bossRuleHelp').onclick=()=>{$('#bossRuleBox').hidden=!$('#bossRuleBox').hidden});$('#bossCharSelect').onchange=()=>{preserveBossGridSelection();const prev=bossSettingActiveCharId;if(prev&&isValidNotionId(prev))saveBossSettingForChar(prev,{silent:true});bossSettingActiveCharId=$('#bossCharSelect').value;renderBossGrid();setBossSettingNote('선택하면 자동으로 저장됩니다.');};$('#bossSettingGrid').addEventListener('click',e=>{const toggle=e.target.closest('#toggleLowBoss');if(!toggle)return;preserveBossGridSelection();showLowBosses=!showLowBosses;renderBossGrid()});$('#bossSettingGrid').addEventListener('change',e=>{const input=e.target.closest('input[type="checkbox"][data-family]');if(!input)return;if(input.checked){const family=input.dataset.family;$$('#bossSettingGrid input[data-family]').forEach(other=>{if(other!==input&&other.dataset.family===family)other.checked=false})}preserveBossGridSelection();renderBossSettingSummary();queueBossSettingAutoSave()});$('#saveBoss').onclick=async()=>{
-        preserveBossGridSelection();
-        const charId=bossSettingActiveCharId||$('#bossCharSelect').value;
-        const raw=$$('#bossSettingGrid input:checked').map(x=>x.value);
-        const normalized=normalizeBossIds(raw);
-        bossSet[charId]=normalized;
-        if(raw.length!==normalized.length)alert('같은 보스 계열 중복 또는 주간 12마리 초과 항목은 제외했어요.');
-        const ok=await saveBossSettingForChar(charId,{close:true,silent:false});
-        if(ok){await loadBossFromWorker(true);renderBoss();}
-      };$('#characterChips').onclick=e=>{const c=e.target.closest('.chip');if(c){bossFilter=c.dataset.id;renderBoss()}};$('#bossList').onclick=async e=>{const charLoot=e.target.closest('[data-charloot]');if(charLoot){openBossLootMemo('char:'+charLoot.dataset.charloot);return}const money=e.target.closest('[data-moneyvalue]');if(money){moneyDetail(money.dataset.moneylabel||'금액',money.dataset.moneyvalue||0);return}const loot=e.target.closest('[data-bossloot]');if(loot){openBossLootMemo(loot.dataset.bossloot);return}const del=e.target.closest('[data-deleteboss]');if(del){const r=bossRecords.find(x=>x.key===del.dataset.deleteboss);const cid=r?.charId;bossRecords=bossRecords.filter(x=>x.key!==del.dataset.deleteboss);renderBoss();if(cid)await saveBossWeeklyRecordForChar(cid);return}const c=e.target.closest('[data-bosskey]');if(c){const r=bossRecords.find(x=>x.key===c.dataset.bosskey);if(r){r.clear=!r.clear;renderBoss();await saveBossWeeklyRecordForChar(r.charId)}}};$('#bossList').addEventListener('change',async e=>{const mode=e.target.closest('[data-partykey]');if(mode){const r=bossRecords.find(x=>x.key===mode.dataset.partykey);if(r){r.partyType=mode.value;if(r.partyType==='other'&&!r.otherParty)r.otherParty=3;saveBossPartyPref(r);renderBoss();if(r.clear)await saveBossWeeklyRecordForChar(r.charId)}return}const other=e.target.closest('[data-otherpartykey]');if(other){const r=bossRecords.find(x=>x.key===other.dataset.otherpartykey);if(r){r.otherParty=Number(other.value)||3;saveBossPartyPref(r);renderBoss();if(r.clear)await saveBossWeeklyRecordForChar(r.charId)}}});$('#bossLootMemo')&&($('#bossLootMemo').oninput=updateBossLootCalc);$('#bossLootForm')&&($('#bossLootForm').onsubmit=async e=>{e.preventDefault();const input=$('#bossLootMemo')?.value||'';if(String(editingBossLootKey||'').startsWith('char:')){const charId=String(editingBossLootKey).slice(5);bossLootMemos[charId]=uniqueMemoLines(input).join('\n');renderBoss();await saveBossWeeklyRecordForChar(charId,{silent:true})}else{const r=bossRecords.find(x=>x.key===editingBossLootKey);if(r&&String(input).trim()){bossLootMemos[r.charId]=appendBossMemoLine(bossLootMemos[r.charId]||'',r.name,input);renderBoss();await saveBossWeeklyRecordForChar(r.charId,{silent:true})}}closeBossLootSheet()});$('#clearBossLoot')&&($('#clearBossLoot').onclick=()=>{$('#bossLootMemo').value='';updateBossLootCalc()});$('#closeBossLoot')&&($('#closeBossLoot').onclick=closeBossLootSheet);
-      const openSettingsBtn=$('#openSettings');if(openSettingsBtn)openSettingsBtn.onclick=openSettings;const closeSettingsBtn=$('#closeSettings');if(closeSettingsBtn)closeSettingsBtn.onclick=closeSettings;const settingsForm=$('#settingsForm');if(settingsForm)settingsForm.onsubmit=saveSettingsForm;const viewModeSelect=$('#settingViewMode');if(viewModeSelect)viewModeSelect.onchange=()=>setViewMode(viewModeSelect.value);const settingLoadBtn=$('#settingLoadNotion');if(settingLoadBtn)settingLoadBtn.onclick=async()=>{await loadProjectsFromWorker(true);loadCalendarFromWorker(false)};const clearSettingsBtn=$('#clearSettings');if(clearSettingsBtn)clearSettingsBtn.onclick=()=>{clearPaperConfig();fillSettingsForm();const s=$('#settingsStatus');if(s)s.textContent='저장된 설정을 지웠어요.'};const cancelToggle=$('#showCanceledSchedules');if(cancelToggle){cancelToggle.checked=state.showCanceled;cancelToggle.onchange=()=>{state.showCanceled=cancelToggle.checked;loadCalendarFromWorker(false)}};const dateStripEl=$('#dateStrip');if(dateStripEl)dateStripEl.ondblclick=toggleWeekStrip;const stickyTopEl=$('#stickyTop');if(stickyTopEl)stickyTopEl.ondblclick=()=>{localStorage.setItem('paperWeekStripHidden','false');applyWeekStripHidden()};const currentMonthLabel=$('#stickyMonthLabel');if(currentMonthLabel)currentMonthLabel.textContent=`${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월`;$('#expenseDate').value=key(today);$('#incomeDate').value=key(today);$('#bossWeekTitle').textContent=weekKey();applyWeekStripHidden();dateStrip();      ['addSchedule','entrySubject'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',updateAppointmentTargetVisibility);el.addEventListener('change',updateAppointmentTargetVisibility);}});
-renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(currentViewMode);
+      $('#calendarGrid').onclick=e=>{const d=e.target.closest('.day');if(d){const picked=d.dataset.date;selected=picked;renderCal();if(!isTabletLayout()){const liveDay=$(`#calendarGrid .day[data-date="${picked}"]`);showSchedulePopup(picked,liveDay)}}};$('#monthTitle')?.addEventListener('click',()=>{document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});});$('#prevMonth').onclick=()=>moveCalendarMonth(-1);$('#nextMonth').onclick=()=>moveCalendarMonth(1);$('#calendarTodayBtn')&&($('#calendarTodayBtn').onclick=goCalendarToday);$$('.tab[data-type]').forEach(t=>t.onclick=()=>{const type=t.dataset.type,on=Object.values(state.show).filter(Boolean).length;if(state.show[type]&&on===1)return;state.show[type]=!state.show[type];t.classList.toggle('on',state.show[type]);renderCal()});$('#openEntry').onclick=openEntry;$('#closeEntry').onclick=()=>{editingCalendarRecord=null;$('#entrySheet').hidden=true;};$('#deleteEntry')?.addEventListener('click',deleteCalendarEntry);$('#addSchedule').onchange=updateEntryMode;$('#entryForm').onsubmit=saveEntry;$('#entrySubject')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();const el=e.currentTarget;const start=el.selectionStart??el.value.length,end=el.selectionEnd??el.value.length;el.value=el.value.slice(0,start)+'\n'+el.value.slice(end);el.selectionStart=el.selectionEnd=start+1;}});$('#calendarDetail').addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit){openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit);return}const open=e.target.closest('[data-open-schedule-popup]');if(open){const dayEl=$(`#calendarGrid .day[data-date="${selected}"]`);showSchedulePopup(selected,dayEl)}});const schedulePopupBg=$('#schedulePopupBg');if(schedulePopupBg)schedulePopupBg.addEventListener('click',e=>{if(e.target===schedulePopupBg)hideSchedulePopup()});const schedulePopupClose=$('#schedulePopupClose');if(schedulePopupClose)schedulePopupClose.onclick=hideSchedulePopup;const schedulePopupContent=$('#schedulePopupContent');if(schedulePopupContent)schedulePopupContent.addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit)openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit)});document.addEventListener('click',e=>{const bg=$('#schedulePopupBg');if(!bg||bg.hidden||isTabletLayout())return;if(e.target.closest('#schedulePopup')||e.target.closest('.day')||e.target.closest('[data-open-schedule-popup]'))return;hideSchedulePopup()});      const openSettingsBtn=$('#openSettings');if(openSettingsBtn)openSettingsBtn.onclick=openSettings;const closeSettingsBtn=$('#closeSettings');if(closeSettingsBtn)closeSettingsBtn.onclick=closeSettings;const settingsForm=$('#settingsForm');if(settingsForm)settingsForm.onsubmit=saveSettingsForm;const settingLoadBtn=$('#settingLoadNotion');if(settingLoadBtn)settingLoadBtn.onclick=async()=>{await loadProjectsFromWorker(true);loadCalendarFromWorker(false)};const clearSettingsBtn=$('#clearSettings');if(clearSettingsBtn)clearSettingsBtn.onclick=()=>{clearPaperConfig();fillSettingsForm();const s=$('#settingsStatus');if(s)s.textContent='저장된 설정을 지웠어요.'};const cancelToggle=$('#showCanceledSchedules');if(cancelToggle){cancelToggle.checked=state.showCanceled;cancelToggle.onchange=()=>{state.showCanceled=cancelToggle.checked;loadCalendarFromWorker(false)}};const dateStripEl=$('#dateStrip');if(dateStripEl)dateStripEl.ondblclick=toggleWeekStrip;const stickyTopEl=$('#stickyTop');if(stickyTopEl)stickyTopEl.ondblclick=()=>{localStorage.setItem('paperWeekStripHidden','false');applyWeekStripHidden()};const currentMonthLabel=$('#stickyMonthLabel');if(currentMonthLabel)currentMonthLabel.textContent=`${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월`;applyWeekStripHidden();dateStrip();      ['addSchedule','entrySubject'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',updateAppointmentTargetVisibility);el.addEventListener('change',updateAppointmentTargetVisibility);}});
+renderCal();renderDashboard();restoreCalendarCache();
       const savedPage=localStorage.getItem(ACTIVE_PAGE_KEY)||'dashboard';
       page(savedPage,{scroll:false});
-      if(hasPaperConfig()){setTimeout(()=>{loadProjectsFromWorker(true);loadCalendarFromWorker(true);loadDashboardTodayFromWorker();loadBossFromWorker(true)},300)}else setTimeout(()=>openSettings(),250);window.addEventListener('resize',()=>{hideSchedulePopup();renderDetail()});console.assert($('#stickyMonthLabel'),'test: header month label exists');console.assert($$('.navBtn').length===4,'test: nav has 4 tabs');console.assert($('#calendarGrid'),'test: calendar grid exists');
+      if(hasPaperConfig()){setTimeout(()=>{loadProjectsFromWorker(true);loadCalendarFromWorker(true);loadDashboardTodayFromWorker()},300)}else setTimeout(()=>openSettings(),250);window.addEventListener('resize',()=>{hideSchedulePopup();renderDetail()});console.assert($('#stickyMonthLabel'),'test: header month label exists');console.assert($$('.navBtn').length===3,'test: nav has 3 tabs');console.assert($('#calendarGrid'),'test: calendar grid exists');
     });
   </script>
 
@@ -2508,6 +2326,7 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
       let moneyView=new Date(today.getFullYear(),today.getMonth(),1);
       let selectedMoneyDate='';
       let moneyRecords=[];
+      let moneyRecordTypeFilter='all';
       let moneyDays={};
       let currentMoneyType='expense';
       let editingMoneyRecord=null;
@@ -2516,9 +2335,10 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
       let lastMoneySubmitAt=0;
       let moneySubjectTouched=false;
       let moneyCardTouched=false;
-      const MONEY_EXPENSE_CATEGORIES=['식비','간식','장비','카페','편의점','데이트','교통비','문화생활비','오락','쇼핑','쇼핑(기기)','쇼핑(의류)','쇼핑(화장품)','미용','친목','주거비','통신비','보험료','의료비','주유비','저축','투자','경조사비','교육비','기부금','숙박비','여행','공과금','기타','카드대금','확인','이체','법인카드'];
-      const MONEY_INCOME_CATEGORIES=['월급','수당','시간외','배당금','이자','M','부수입','이체','법인카드','출장','기타'];
-      const MONEY_CARDS=['토스뱅크','국민은행','국민카드','돼지카드','카카오뱅크','카카오페이','삼성카드','롯데카드','법인카드','주식','네이버페이','쿠팡','문화상품권'];
+      const MONEY_EXPENSE_CATEGORIES=['식비 및 음식','커피 및 음료','교통비(자전거·킥보드)','교통비(택시)','미용','약·영양제','보험료','오락','기타'];
+      const MONEY_INCOME_CATEGORIES=['월급 기본급','자가운전보조금','시간외수당','식대','이자','기타'];
+      const MONEY_SAVINGS_CATEGORIES=['전북은행 적금','청년주택청약','개인연금','미래에셋 투자','기타'];
+      const MONEY_CARDS=['토스뱅크','국민카드','국민은행','카카오뱅크','카카오페이','삼성카드','법인카드','현금','기타'];
 
       function monthKey(){return `${moneyView.getFullYear()}-${String(moneyView.getMonth()+1).padStart(2,'0')}`}
       function todayMoneyMonthKey(){return `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}`}
@@ -2569,16 +2389,17 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
         updateMoneyCalcDisplay();
       }
       function sameMonth(dateText){return dateText&&dateText.slice(0,7)===monthKey()}
-      function amountText(record){return `${record.type==='income'?'+':'-'}${won(record.amount)}`}
-      function updateDashMoney(summary){const dash=$('#dashMoneySummary');if(!dash||!summary)return;dash.innerHTML=`오늘 기준 월 수입 ${won(summary.income)}원<br>오늘 기준 월 지출 ${won(summary.expense)}원`}
+      function amountText(record){return `${record.type==='income'?'+':record.type==='savings'?'💰':'-'}${won(record.amount)}`}
+      function updateDashMoney(summary){const dash=$('#dashMoneySummary');if(!dash||!summary)return;dash.innerHTML=`월 수입 ${won(summary.income)}원 / 지출 ${won(summary.expense)}원<br>저축 ${won(summary.savings)}원`}
 
       function computeSummary(records){
         const income=records.filter(r=>r.type==='income').reduce((a,b)=>a+Number(b.amount||0),0);
         const expense=records.filter(r=>r.type==='expense').reduce((a,b)=>a+Number(b.amount||0),0);
-        const waste=records.filter(r=>r.type==='expense'&&r.waste).reduce((a,b)=>a+Number(b.amount||0),0);return {income,expense,balance:income-expense,waste,count:records.length};
+        const savings=records.filter(r=>r.type==='savings').reduce((a,b)=>a+Number(b.amount||0),0);
+        return {income,expense,savings,balance:income-expense-savings,count:records.length};
       }
       function computeDays(records){
-        return records.reduce((acc,r)=>{if(!r.date)return acc;(acc[r.date]??={income:false,expense:false,waste:false});if(r.type==='income')acc[r.date].income=true;if(r.type==='expense')acc[r.date].expense=true;if(r.waste)acc[r.date].waste=true;return acc},{});
+        return records.reduce((acc,r)=>{if(!r.date)return acc;(acc[r.date]??={income:false,expense:false,savings:false});if(r.type==='income')acc[r.date].income=true;if(r.type==='expense')acc[r.date].expense=true;if(r.type==='savings')acc[r.date].savings=true;return acc},{});
       }
       let moneyLoadSeq=0, dashboardMoneyLoadSeq=0;
       function getMoneyCacheStore(){try{return JSON.parse(localStorage.getItem(MONEY_CACHE_KEY)||'{}')}catch{return {}}}
@@ -2661,8 +2482,8 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
         moneyDays=byDay;
         $('#moneyIncomeTotal')&&( $('#moneyIncomeTotal').textContent='+'+won(summary.income));
         $('#moneyExpenseTotal')&&( $('#moneyExpenseTotal').textContent='-'+won(summary.expense));
+        $('#moneySavingsTotal')&&( $('#moneySavingsTotal').textContent=won(summary.savings));
         $('#moneyBalanceTotal')&&( $('#moneyBalanceTotal').textContent=(summary.balance>=0?'+':'-')+won(Math.abs(summary.balance)) );
-        $('#moneyWasteTotal')&&( $('#moneyWasteTotal').textContent='-'+won(summary.waste||0));
         renderMoneyCalendar(byDay);
         renderMoneyRecords(monthly);
         if($('#moneyStatsSheet')&&!$('#moneyStatsSheet').hidden)renderMoneyStats(currentMoneyStatsType);
@@ -2680,7 +2501,10 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
 
       function renderMoneyRecords(monthly){
         const list=$('#moneyRecordList'), head=$('#moneyRecordTitle'), clear=$('#moneyClearFilter'), totalsEl=$('#moneyRecordTotals');if(!list)return;
-        const filtered=selectedMoneyDate?monthly.filter(r=>r.date===selectedMoneyDate):monthly;
+        let filtered=selectedMoneyDate?monthly.filter(r=>r.date===selectedMoneyDate):monthly;
+        if(moneyRecordTypeFilter!=='all')filtered=filtered.filter(r=>r.type===moneyRecordTypeFilter);
+        $$('.moneyRecordFilterBtn').forEach(b=>b.classList.toggle('on',b.dataset.filterType===moneyRecordTypeFilter));
+        const filterTabs=$('#moneyRecordFilterTabs');if(filterTabs)filterTabs.dataset.activeFilter=moneyRecordTypeFilter;
         const sorted=[...filtered].sort((a,b)=>(b.date||'').localeCompare(a.date||'')||String(b.id||'').localeCompare(String(a.id||'')));
         if(head)head.textContent=selectedMoneyDate?`${selectedMoneyDate} 기록`:`${moneyTitle()} 기록`;
         if(clear)clear.hidden=!selectedMoneyDate;
@@ -2696,7 +2520,8 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
           }
         }
         if(!sorted.length){list.innerHTML='<li><p class="moneyEmpty">표시할 기록이 없어요.</p></li>';return}
-        list.innerHTML=sorted.map(r=>`<li class="moneyRecordItem" data-money-edit="${r.id}" data-money-type="${r.type}" title="클릭해서 수정"><span><strong>${r.title||'(제목 없음)'}</strong><small>${r.date||''} · ${r.type==='income'?'수입':'지출'} · ${r.category||r.subject||'분류 없음'}${r.card?' · '+r.card:''}${r.waste?'<span class="wasteTag">Waste</span>':''}</small></span><span class="amount ${r.type==='income'?'income':'expense'}">${amountText(r)}</span>${r.url?`<a class="goLink" href="${r.url}" target="_blank" rel="noopener noreferrer" aria-label="Notion 바로가기">↗</a>`:'<span class="goLink disabled">↗</span>'}</li>`).join('');
+        const typeLabel={'income':'수입','expense':'지출','savings':'저축'};
+        list.innerHTML=sorted.map(r=>`<li class="moneyRecordItem" data-money-edit="${r.id}" data-money-type="${r.type}" title="클릭해서 수정"><span><strong>${r.title||'(제목 없음)'}</strong><small>${r.date||''} · ${typeLabel[r.type]||r.type} · ${r.category||'분류 없음'}${r.payment?' · '+r.payment:''}</small></span><span class="amount ${r.type==='income'?'income':r.type==='savings'?'':' expense'}">${amountText(r)}</span></li>`).join('');
       }
 
       let currentMoneyStatsType='expense';
@@ -2719,21 +2544,94 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
         currentMoneyStatsType=type;
         $$('.moneyStatsTypeBtn').forEach(btn=>btn.classList.toggle('on',btn.dataset.statsType===type));
         const chartBtn=$('#moneyStatsChartBtn');if(chartBtn)chartBtn.classList.toggle('on',moneyStatsChartMode);
-        const title=$('#moneyStatsMonth');if(title)title.textContent=`${moneyTitle()} ${type==='income'?'수입':'지출'} ${moneyStatsChartMode?'차트':'통계'}`;
+        const typeLabel2={'income':'수입','expense':'지출','savings':'저축'};
+        const title=$('#moneyStatsMonth');if(title)title.textContent=`${moneyTitle()} ${typeLabel2[type]||type} ${moneyStatsChartMode?'차트':'통계'}`;
         const rows=getMoneyCategoryStats(type);
         const total=rows.reduce((a,b)=>a+b.total,0);
         const totalEl=$('#moneyStatsTotal');if(totalEl)totalEl.textContent=(type==='income'?'+':'-')+won(total);
         const list=$('#moneyStatsList');if(!list)return;
         list.classList.toggle('chartMode',moneyStatsChartMode);
         if(!rows.length){list.innerHTML='<p class="moneyStatsEmpty">표시할 통계가 없어요.</p>';return}
+        const amtClass=type==='income'?'income':'expense';
+        const amtSign=type==='income'?'+':'-';
+        const COLORS=['#e7c3c8','#b9dced','#f4d98b','#bfd8b8','#c9b8e8','#e8c4a4','#b8d8d0','#dcc4b8','#c4d0e8','#e0d4a8'];
         if(moneyStatsChartMode){
-          const max=Math.max(...rows.map(r=>r.total),1);
-          list.innerHTML=rows.map(row=>{const pct=Math.max(4,Math.round(row.total/max*100));return `<div class="moneyChartRow"><div class="moneyChartTop"><span>${row.category}</span><strong class="amount ${type==='income'?'income':'expense'}">${type==='income'?'+':'-'}${won(row.total)}</strong></div><div class="moneyChartTrack"><div class="moneyChartFill ${type==='income'?'income':'expense'}" style="width:${pct}%"></div></div><div class="moneyChartMeta">${row.count}건${row.waste?' · Waste '+won(row.waste)+'원':''}</div></div>`}).join('');
+          // SVG 도넛 차트
+          const cx=100,cy=100,R=82,r=48;
+          let paths='';let ang=-Math.PI/2;
+          rows.forEach((row,i)=>{
+            const pct=total>0?row.total/total:0;
+            const sweep=pct*2*Math.PI;
+            const color=COLORS[i%COLORS.length];
+            if(pct>=0.9999){
+              paths+=`<circle data-slice-idx="${i}" cx="${cx}" cy="${cy}" r="${(R+r)/2}" fill="none" stroke="${color}" stroke-width="${R-r}" style="cursor:pointer;transition:opacity .15s"/>`;
+            }else{
+              const x1=cx+R*Math.cos(ang),y1=cy+R*Math.sin(ang);
+              const x2=cx+R*Math.cos(ang+sweep),y2=cy+R*Math.sin(ang+sweep);
+              const x3=cx+r*Math.cos(ang+sweep),y3=cy+r*Math.sin(ang+sweep);
+              const x4=cx+r*Math.cos(ang),y4=cy+r*Math.sin(ang);
+              const lg=sweep>Math.PI?1:0;
+              paths+=`<path data-slice-idx="${i}" d="M${x1.toFixed(1)},${y1.toFixed(1)} A${R},${R},0,${lg},1,${x2.toFixed(1)},${y2.toFixed(1)} L${x3.toFixed(1)},${y3.toFixed(1)} A${r},${r},0,${lg},0,${x4.toFixed(1)},${y4.toFixed(1)} Z" fill="${color}" stroke="#fffdf7" stroke-width="2" style="cursor:pointer;transition:opacity .15s"/>`;
+            }
+            ang+=sweep;
+          });
+          const legend=rows.map((row,i)=>`<div class="moneyStatsLegendRow" data-legend-idx="${i}" style="cursor:pointer"><span class="moneyStatsLegendDot" style="background:${COLORS[i%COLORS.length]}"></span><span class="moneyStatsLegendCat">${row.category}</span><span class="moneyStatsLegendPct">${total>0?Math.round(row.total/total*100):0}%</span><span class="amount ${amtClass}">${amtSign}${won(row.total)}</span></div>`).join('');
+          list.innerHTML=`<svg viewBox="0 0 200 200" class="moneyDonutSvg">
+            ${paths}
+            <text class="donutCenterCat" x="100" y="91" text-anchor="middle" font-family="'Gowun Dodum',sans-serif" font-size="11" fill="#786f65"></text>
+            <text class="donutCenterAmt" x="100" y="108" text-anchor="middle" font-family="'Gaegu',sans-serif" font-size="19" fill="#2f2a28"></text>
+            <text class="donutCenterPct" x="100" y="124" text-anchor="middle" font-family="'Gaegu',sans-serif" font-size="14" fill="#786f65"></text>
+          </svg><div class="moneyStatsLegend">${legend}</div>`;
+          // 도넛 중앙 툴팁 인터랙션
+          const svg=list.querySelector('.moneyDonutSvg');
+          if(svg){
+            const catEl=svg.querySelector('.donutCenterCat');
+            const amtEl=svg.querySelector('.donutCenterAmt');
+            const pctEl=svg.querySelector('.donutCenterPct');
+            const slices=svg.querySelectorAll('[data-slice-idx]');
+            let activeIdx=-1;
+            const showInfo=(idx)=>{
+              activeIdx=idx;
+              const row=rows[idx];if(!row)return;
+              if(catEl)catEl.textContent=row.category;
+              if(amtEl){amtEl.textContent=amtSign+won(row.total);amtEl.setAttribute('fill',type==='income'?'#4f7c4f':'#8a4b4b');}
+              if(pctEl)pctEl.textContent=total>0?Math.round(row.total/total*100)+'%':'0%';
+              slices.forEach((s,j)=>s.style.opacity=Number(s.dataset.sliceIdx)===idx?'1':'0.45');
+              list.querySelectorAll('[data-legend-idx]').forEach(l=>l.style.opacity=Number(l.dataset.legendIdx)===idx?'1':'0.45');
+            };
+            const clearInfo=()=>{
+              activeIdx=-1;
+              if(catEl)catEl.textContent='';if(amtEl)amtEl.textContent='';if(pctEl)pctEl.textContent='';
+              slices.forEach(s=>s.style.opacity='1');
+              list.querySelectorAll('[data-legend-idx]').forEach(l=>l.style.opacity='1');
+            };
+            slices.forEach(s=>{
+              const idx=Number(s.dataset.sliceIdx);
+              s.addEventListener('mouseenter',()=>showInfo(idx));
+              s.addEventListener('mouseleave',()=>{if(activeIdx===idx)clearInfo()});
+              s.addEventListener('click',()=>activeIdx===idx?clearInfo():showInfo(idx));
+              s.addEventListener('touchstart',e=>{e.preventDefault();activeIdx===idx?clearInfo():showInfo(idx)},{passive:false});
+            });
+            list.querySelectorAll('[data-legend-idx]').forEach(l=>{
+              const idx=Number(l.dataset.legendIdx);
+              l.addEventListener('mouseenter',()=>showInfo(idx));
+              l.addEventListener('mouseleave',()=>{if(activeIdx===idx)clearInfo()});
+              l.addEventListener('click',()=>activeIdx===idx?clearInfo():showInfo(idx));
+            });
+          }
           return;
         }
-        list.innerHTML=rows.map(row=>`<div class="moneyStatsRow"><span><strong>${row.category}</strong><small>${row.count}건${row.waste?' · Waste '+won(row.waste)+'원':''}</small></span><span class="amount ${type==='income'?'income':'expense'}">${type==='income'?'+':'-'}${won(row.total)}</span></div>`).join('');
+        // 리스트 모드: 카테고리 클릭 시 상세 기록 아코디언
+        list.innerHTML=rows.map((row,i)=>`<div class="moneyStatsRow moneyStatsAccordion"><div class="moneyStatsRowHead"><span><strong>${row.category}</strong><small>${row.count}건${row.waste?' · Waste '+won(row.waste)+'원':''}</small></span><span class="amount ${amtClass} moneyStatsRowAmt">${amtSign}${won(row.total)}</span><span class="moneyStatsToggle">▾</span></div><div class="moneyStatsDetailList" hidden>${row.records.sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(rec=>`<div class="moneyStatsDetailRow"><span class="moneyStatsDetailDate">${rec.date||''}</span><span>${rec.title||'(제목 없음)'}</span><span class="amount ${amtClass}">${amtSign}${won(Number(rec.amount||0))}</span></div>`).join('')}</div></div>`).join('');
+        list.querySelectorAll('.moneyStatsAccordion').forEach(row=>{
+          row.querySelector('.moneyStatsRowHead').addEventListener('click',()=>{
+            const detail=row.querySelector('.moneyStatsDetailList');
+            const toggle=row.querySelector('.moneyStatsToggle');
+            if(detail){detail.hidden=!detail.hidden;if(toggle)toggle.textContent=detail.hidden?'▾':'▴';}
+          });
+        });
       }
-      function openMoneyStats(){moneyStatsChartMode=true;const sheet=$('#moneyStatsSheet');if(sheet)sheet.hidden=false;renderMoneyStats(currentMoneyStatsType)}
+      function openMoneyStats(){moneyStatsChartMode=false;const sheet=$('#moneyStatsSheet');if(sheet)sheet.hidden=false;renderMoneyStats(currentMoneyStatsType)}
       function closeMoneyStats(){const sheet=$('#moneyStatsSheet');if(sheet)sheet.hidden=true}
 
       async function loadMoneyFromWorker(silent=false){
@@ -2796,20 +2694,19 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
         setSelectValue($('#moneyEntrySubject'),record.category||'');
         setSelectValue($('#moneyEntryCard'),record.card||record.payment||record.account||'');
         $('#moneyEntryMemo')&&( $('#moneyEntryMemo').value=record.memo||'');
-        $('#moneyEntryWaste')&&( $('#moneyEntryWaste').checked=!!record.waste);
-        $('#moneyEntryDone')&&( $('#moneyEntryDone').checked=record.done!==false);
-        const status=$('#moneyEntryStatus');if(status)status.textContent='수정 후 Notion에 반영됩니다.';
+        const status=$('#moneyEntryStatus');if(status)status.textContent='수정 후 저장됩니다.';
       }
       function closeMoneySheet(){const sheet=$('#moneySheet');if(sheet)sheet.hidden=true;editingMoneyRecord=null;const title=$('#moneySheetTitle');if(title)title.textContent='가계부 입력';$('#deleteMoneyEntry')&&($('#deleteMoneyEntry').hidden=true)}
       function setMoneyType(type){
         currentMoneyType=type;
-        $$('.moneyTypeBtn').forEach(b=>b.classList.toggle('on',b.dataset.moneyType===type));
-        const isIncome=type==='income';
+        $$('.moneyTypeBtn[data-money-type]').forEach(b=>b.classList.toggle('on',b.dataset.moneyType===type));
+        const isIncome=type==='income';const isSavings=type==='savings';
         $$('.moneyIncomeOnly').forEach(el=>el.hidden=!isIncome);
-        $$('.moneyExpenseOnly').forEach(el=>el.hidden=isIncome);
-        const lab=$('#moneyCardLabel');if(lab)lab.textContent=isIncome?'입금계좌':'결제수단';
-        fillMoneySelect($('#moneyEntrySubject'),isIncome?MONEY_INCOME_CATEGORIES:MONEY_EXPENSE_CATEGORIES,'분류 선택');
-        fillMoneySelect($('#moneyEntryCard'),MONEY_CARDS,isIncome?'계좌 선택':'카드 선택');
+        $$('.moneyExpenseOnly').forEach(el=>el.hidden=isIncome||isSavings);
+        const lab=$('#moneyCardLabel');if(lab)lab.textContent=isIncome?'입금계좌':isSavings?'저축계좌':'결제수단';
+        const cats=isIncome?MONEY_INCOME_CATEGORIES:isSavings?MONEY_SAVINGS_CATEGORIES:MONEY_EXPENSE_CATEGORIES;
+        fillMoneySelect($('#moneyEntrySubject'),cats,'분류 선택');
+        fillMoneySelect($('#moneyEntryCard'),MONEY_CARDS,isIncome?'계좌 선택':isSavings?'저축계좌 선택':'카드 선택');
       }
       function moneySubmitKey(saveType,body,method){
         return [
@@ -2844,18 +2741,16 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
         const saveType=editingMoneyRecord?editingMoneyRecord.type:currentMoneyType;
         const body={
           id:editingMoneyRecord?.id||'',
+          type:saveType,
           title:$('#moneyEntryTitle')?.value.trim()||'',
           date:$('#moneyEntryDate')?.value||'',
           amount,
           category:$('#moneyEntrySubject')?.value.trim()||'',
-          subject:$('#moneyEntrySubject')?.value.trim()||'',
-          card:$('#moneyEntryCard')?.value.trim()||'',
-          memo:$('#moneyEntryMemo')?.value.trim()||'',
-          done:$('#moneyEntryDone')?.checked!==false,
-          waste:!!$('#moneyEntryWaste')?.checked
+          payment:$('#moneyEntryCard')?.value.trim()||'',
+          memo:$('#moneyEntryMemo')?.value.trim()||''
         };
         if(!body.title||!body.date||!body.amount){const s=$('#moneyEntryStatus');if(s)s.textContent='내용, 날짜, 금액을 입력해줘.';return}
-        const path=saveType==='income'?'/api/money/income':'/api/money/expense';
+        const path=editingMoneyRecord?`/api/money/${editingMoneyRecord.id}`:'/api/money';
         const method=editingMoneyRecord?'PATCH':'POST';
         const submitKey=moneySubmitKey(saveType,body,method);
         const now=Date.now();
@@ -2883,8 +2778,6 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
             $('#moneyEntryTitle')&&($('#moneyEntryTitle').value='');
             $('#moneyEntryAmount')&&($('#moneyEntryAmount').value='');
             $('#moneyEntryMemo')&&($('#moneyEntryMemo').value='');
-            $('#moneyEntryWaste')&&($('#moneyEntryWaste').checked=false);
-            $('#moneyEntryDone')&&($('#moneyEntryDone').checked=true);
             moneySubjectTouched=false;
             const s=$('#moneyEntryStatus');if(s)s.textContent='저장했어. 이어서 입력할 수 있어.';
           }else{
@@ -2902,12 +2795,10 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
       async function deleteMoneyEntry(){
         if(!editingMoneyRecord?.id)return;
         const name=editingMoneyRecord.title||'이 기록';
-        if(!confirm(`${name} 기록을 삭제할까요?\nNotion에서는 휴지통/보관 처리됩니다.`))return;
-        const type=editingMoneyRecord.type==='income'?'income':'expense';
+        if(!confirm(`${name} 기록을 삭제할까요?`))return;
         try{
-          const res=await window.paperLog.fetch(`/api/money/${type}`,{
-            method:'DELETE',
-            body:JSON.stringify({id:editingMoneyRecord.id})
+          const res=await window.paperLog.fetch(`/api/money/${editingMoneyRecord.id}`,{
+            method:'DELETE'
           });
           const data=await res.json().catch(()=>({}));
           if(!res.ok||data.ok===false)throw new Error(data.message||data.error||'삭제 실패');
@@ -2956,11 +2847,12 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
       $('#closeMoneyStats')?.addEventListener('click',closeMoneyStats);
       $$('.moneyStatsTypeBtn').forEach(btn=>btn.addEventListener('click',()=>renderMoneyStats(btn.dataset.statsType)));
       $('#moneyStatsChartBtn')?.addEventListener('click',()=>{moneyStatsChartMode=!moneyStatsChartMode;renderMoneyStats(currentMoneyStatsType)});
+      $$('.moneyRecordFilterBtn').forEach(btn=>btn.addEventListener('click',()=>{moneyRecordTypeFilter=btn.dataset.filterType;renderMoneyRecords(moneyRecords.filter(r=>sameMonth(r.date)))}));
       $('#moneyMonthTitle')?.addEventListener('click',()=>{document.querySelector('#budget')?.scrollIntoView({behavior:'smooth',block:'start'});});
       $('#closeMoneyEntry')?.addEventListener('click',closeMoneySheet);
       $('#deleteMoneyEntry')?.addEventListener('click',deleteMoneyEntry);
       $('#moneyRecordList')?.addEventListener('click',e=>{if(e.target.closest('a'))return;const el=e.target.closest('[data-money-edit]');if(!el)return;const id=el.dataset.moneyEdit;const record=moneyRecords.find(r=>r.id===id);if(record)openMoneyEdit(record)});
-      $$('.moneyTypeBtn').forEach(btn=>btn.addEventListener('click',()=>{moneySubjectTouched=false;moneyCardTouched=false;setMoneyType(btn.dataset.moneyType);const def=btn.dataset.moneyType==='income'?'국민카드':'토스뱅크';setSelectValue($('#moneyEntryCard'),def);applyMoneySuggestion()}));
+      $$('.moneyTypeBtn[data-money-type]').forEach(btn=>btn.addEventListener('click',()=>{moneySubjectTouched=false;moneyCardTouched=false;setMoneyType(btn.dataset.moneyType);const def=btn.dataset.moneyType==='income'?'국민카드':btn.dataset.moneyType==='savings'?'전북은행 적금':'토스뱅크';setSelectValue($('#moneyEntryCard'),def);applyMoneySuggestion()}));
       $('#moneyEntryTitle')?.addEventListener('input',()=>applyMoneySuggestion());
       $('#moneyEntryAmount')?.addEventListener('blur',formatAmountInput);
       $('#moneyEntryAmount')?.addEventListener('focus',normalizeAmountInputBeforeCalc);
@@ -2971,6 +2863,51 @@ renderCal();renderBoss();renderDashboard();restoreCalendarCache();applyViewMode(
       $$('.navBtn').forEach(btn=>btn.addEventListener('click',()=>{if(btn.dataset.target==='budget')setTimeout(()=>loadMoneyFromWorker(true),220)}));
       $('#settingLoadNotion')?.addEventListener('click',()=>{setTimeout(()=>loadMoneyFromWorker(true),400);setTimeout(()=>loadDashboardMoneyFromWorker(),700)});
       $('#settingsForm')?.addEventListener('submit',()=>{setTimeout(()=>loadMoneyFromWorker(true),700);setTimeout(()=>loadDashboardMoneyFromWorker(),1000)});
+      // XLS 가져오기 (쉬운가계부 형식)
+      async function importMoneyXls(file){
+        if(!window.XLSX){alert('XLSX 라이브러리가 로드되지 않았어요. 잠시 후 다시 시도해주세요.');return}
+        if(!hasPaperConfig()){alert('Worker 설정을 먼저 저장해주세요.');return}
+        setMoneyStatus('XLS 파일 분석 중...');
+        try{
+          const buf=await file.arrayBuffer();
+          const wb=XLSX.read(buf,{type:'array'});
+          const sh=wb.Sheets[wb.SheetNames[0]];
+          const rows=XLSX.utils.sheet_to_json(sh,{header:1,raw:false});
+          if(!rows.length){setMoneyStatus('파일이 비어 있어요.');return}
+          // 헤더 확인: 분류, 날짜, 시간, 금액, 카테고리, 메모, 고정
+          const header=rows[0].map(h=>String(h||'').trim());
+          const iCol=header.indexOf('분류'),dCol=header.indexOf('날짜'),aCol=header.indexOf('금액'),cCol=header.indexOf('카테고리'),mCol=header.indexOf('메모');
+          if(iCol<0||dCol<0||aCol<0){setMoneyStatus('올바른 쉬운가계부 XLS 형식이 아니에요. (분류/날짜/금액 컬럼 필요)');return}
+          const typeMap={'수입':'income','지출':'expense','저축':'savings'};
+          const dataRows=rows.slice(1).filter(r=>r.length>Math.max(iCol,dCol,aCol));
+          let ok=0,fail=0;
+          for(const row of dataRows){
+            const typeKr=String(row[iCol]||'').trim();
+            const type=typeMap[typeKr];
+            if(!type)continue;
+            const rawDate=String(row[dCol]||'').trim();
+            // 날짜 파싱: '2026. 7. 2.' 또는 'YYYY-MM-DD' 등
+            let date=rawDate.replace(/\.\s*/g,'-').replace(/-$/,'').trim();
+            // 2026-7-2 → 2026-07-02
+            const dp=date.split('-');if(dp.length===3)date=`${dp[0]}-${dp[1].padStart(2,'0')}-${dp[2].padStart(2,'0')}`;
+            const amount=Number(String(row[aCol]||'').replace(/[,\s]/g,''));
+            if(!date||!amount||amount<=0)continue;
+            const category=cCol>=0?String(row[cCol]||'').trim():'';
+            const memo=mCol>=0?String(row[mCol]||'').trim():'';
+            const title=category||memo||typeKr;
+            try{
+              const res=await window.paperLog.fetch('/api/money',{method:'POST',body:JSON.stringify({type,title,amount,date,category,memo,payment:''})});
+              const data=await res.json().catch(()=>({}));
+              if(res.ok&&data.ok!==false)ok++;else fail++;
+            }catch{fail++}
+          }
+          setMoneyStatus(`XLS 가져오기 완료: ${ok}건 저장, ${fail}건 실패`);
+          if(ok>0)await loadMoneyFromWorker(true);
+        }catch(err){setMoneyStatus('XLS 가져오기 실패: '+err.message);console.warn(err)}
+      }
+      $('#moneyXlsImportBtn')?.addEventListener('click',()=>$('#moneyXlsInput')?.click());
+      $('#moneyXlsInput')?.addEventListener('change',e=>{const f=e.target.files?.[0];if(f){importMoneyXls(f);e.target.value=''}});
+
       restoreMoneyCache();
       saveSuggestionRecords(moneyRecords);
       renderMoney();
