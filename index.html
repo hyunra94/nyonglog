@@ -156,16 +156,6 @@
     }
   </style>
 
-  <style id="schedulePopupMobileStyle">
-    .schedulePopupBg{position:fixed;inset:0;z-index:70;background:transparent;display:block;}
-    .schedulePopupBg[hidden]{display:none;}
-    .schedulePopup{position:fixed;z-index:71;width:min(330px,calc(100vw - 28px));max-height:min(72svh,520px);overflow:auto;border:1.7px solid var(--line);border-radius:20px;background:rgba(255,250,242,.98);box-shadow:0 14px 34px rgba(47,42,40,.18),3px 3px 0 rgba(47,42,40,.14);padding:12px;}
-    .schedulePopup h4{margin:0 0 8px;font-family:'Gaegu';font-size:24px;line-height:1;}
-    .schedulePopup .scheduleItem{grid-template-columns:50px 1fr auto;}
-    .schedulePopupClose{position:absolute;top:8px;right:8px;width:28px;height:28px;border:1.2px solid var(--line);border-radius:999px;background:var(--card);font-family:'Gaegu';font-size:18px;line-height:1;}
-    .schedulePopup{transform-origin:top left;}
-    @media (min-width:960px){.schedulePopupBg{display:none!important}}
-  </style>
 
 
   
@@ -1316,12 +1306,6 @@
 <div class="field"><label>관련 프로젝트</label><select id="entryProject"><option value="">선택 안 함</option></select></div><button class="save" id="entrySaveBtn">일정 저장</button><p class="sheetNote">일정을 Notion에 저장합니다. 오프라인 시 캐시에 임시 보관됩니다.</p></form></section></div>
 
 
-    <div class="schedulePopupBg" id="schedulePopupBg" hidden>
-      <section class="schedulePopup" id="schedulePopup" role="dialog" aria-label="선택 날짜 일정">
-        <button class="schedulePopupClose" id="schedulePopupClose" type="button" aria-label="일정 창 닫기">×</button>
-        <div id="schedulePopupContent"></div>
-      </section>
-    </div>
 
 
 
@@ -1341,7 +1325,7 @@
       </section>
     </div>
 
-    <div class="sheetBg" id="settingsSheet" hidden><section class="sheet"><div class="handle"></div><div class="sheetHead"><h3>Nyong Log 설정</h3><button class="icon" id="closeSettings" type="button">×</button></div><div class="ruleBox"><strong>Worker 연결</strong><span>캘린더 일정은 Notion에, 가계부는 Cloudflare D1에 저장됩니다.</span><span>Worker 주소와 SECRET Key는 이 기기에 저장됩니다.</span></div><form class="entryForm" id="settingsForm"><div class="field"><label>Worker 앞부분</label><input id="settingWorkerName" autocomplete="off" placeholder="예: nyong-log"></div><div class="field"><label>Cloudflare ID</label><input id="settingWorkerId" autocomplete="off" placeholder="예: hyunra94"></div><div class="field"><label>SECRET Key</label><input id="settingSecretKey" type="password" autocomplete="current-password" placeholder="Cloudflare Worker의 SECRET_KEY"></div><label class="typeChip" style="justify-content:flex-start"><input type="checkbox" id="settingRememberSecret" checked> 이 기기에 SECRET Key 저장</label><button class="save" id="saveSettings" type="submit">설정 저장</button><button class="cancel" id="settingLoadNotion" type="button">캘린더 동기화</button><button class="cancel" id="installPwaBtn" type="button" hidden>앱 설치</button><button class="cancel" id="clearSettings" type="button">저장된 설정 지우기</button><p class="sheetNote" id="settingsStatus">설정 저장 후 캘린더 일정을 자동으로 불러옵니다.</p></form></section></div>
+    <div class="sheetBg" id="settingsSheet" hidden><section class="sheet"><div class="handle"></div><div class="sheetHead"><h3>Nyong Log 설정</h3><button class="icon" id="closeSettings" type="button">×</button></div><div class="ruleBox"><strong>Worker 연결</strong><span>캘린더 일정은 Notion에, 가계부는 Cloudflare D1에 저장됩니다.</span><span>Worker 주소와 SECRET Key는 이 기기에 저장됩니다.</span></div><form class="entryForm" id="settingsForm"><div class="field"><label>Worker 앞부분</label><input id="settingWorkerName" autocomplete="off" placeholder="예: nyong"></div><div class="field"><label>Cloudflare ID</label><input id="settingWorkerId" autocomplete="off" placeholder="예: hyunra94"></div><div class="field"><label>SECRET Key</label><input id="settingSecretKey" type="password" autocomplete="current-password" placeholder="Cloudflare Worker의 SECRET_KEY"></div><label class="typeChip" style="justify-content:flex-start"><input type="checkbox" id="settingRememberSecret" checked> 이 기기에 SECRET Key 저장</label><button class="save" id="saveSettings" type="submit">설정 저장</button><button class="cancel" id="settingLoadNotion" type="button">캘린더 동기화</button><button class="cancel" id="installPwaBtn" type="button" hidden>앱 설치</button><button class="cancel" id="clearSettings" type="button">저장된 설정 지우기</button><p class="sheetNote" id="settingsStatus">설정 저장 후 캘린더 일정을 자동으로 불러옵니다.</p></form></section></div>
 
 
 
@@ -1658,75 +1642,6 @@
         }
         box.innerHTML=`<h4>${d.getMonth()+1}/${d.getDate()} ${wk[d.getDay()]}</h4><div class="group">${scheduleRows(v.schedule)}</div>`;
       }
-      function showSchedulePopup(dateKeyValue,anchorEl){
-        if(isTabletLayout())return;
-        const v=visible(dateKeyValue);
-        const schedules=v.schedule||[];
-        if(!schedules.length){hideSchedulePopup();return}
-
-        const bg=$('#schedulePopupBg'), pop=$('#schedulePopup'), content=$('#schedulePopupContent');
-        if(!bg||!pop||!content)return;
-
-        const d=new Date(dateKeyValue+'T00:00:00');
-        content.innerHTML=`<h4>${d.getMonth()+1}/${d.getDate()} ${wk[d.getDay()]} 일정</h4>${scheduleRows(schedules)}`;
-
-        bg.hidden=false;
-        pop.style.visibility='hidden';
-        pop.style.left='0px';
-        pop.style.top='0px';
-
-        // 렌더링 직후 새로 만들어진 날짜 칸을 기준으로 다시 잡는다.
-        const liveAnchor=anchorEl?.isConnected?anchorEl:document.querySelector(`#calendarGrid .day[data-date="${dateKeyValue}"]`);
-        const rect=liveAnchor?.getBoundingClientRect?.();
-        const margin=10;
-        const gap=8;
-        const pw=pop.offsetWidth||Math.min(330,window.innerWidth-28);
-        const ph=pop.offsetHeight||220;
-
-        let left=margin;
-        let top=margin;
-
-        if(rect&&rect.width&&rect.height){
-          const rightLeft=rect.right+gap;
-          const leftSide=rect.left-pw-gap;
-          const bottomTop=rect.bottom+gap;
-          const topSide=rect.top-ph-gap;
-
-          // 1순위: 날짜 칸 바로 오른쪽
-          if(rightLeft+pw<=window.innerWidth-margin){
-            left=rightLeft;
-            top=rect.top;
-          }
-          // 2순위: 날짜 칸 바로 왼쪽
-          else if(leftSide>=margin){
-            left=leftSide;
-            top=rect.top;
-          }
-          // 3순위: 날짜 칸 아래
-          else if(bottomTop+ph<=window.innerHeight-margin){
-            left=rect.left;
-            top=bottomTop;
-          }
-          // 4순위: 날짜 칸 위
-          else if(topSide>=margin){
-            left=rect.left;
-            top=topSide;
-          }
-          // 마지막: 화면 안쪽 중앙 보정
-          else{
-            left=rect.left+(rect.width-pw)/2;
-            top=rect.top+(rect.height-ph)/2;
-          }
-        }
-
-        left=Math.min(Math.max(left,margin),window.innerWidth-pw-margin);
-        top=Math.min(Math.max(top,margin),window.innerHeight-ph-margin);
-
-        pop.style.left=Math.round(left)+'px';
-        pop.style.top=Math.round(top)+'px';
-        pop.style.visibility='visible';
-      }
-      function hideSchedulePopup(){const bg=$('#schedulePopupBg');if(bg)bg.hidden=true}
       function updateEntryMode(){
         const f=$('#entryForm'),s=$('#addSchedule'),t=$('#addTodo'),d=$('#addDaily');
         if(editingCalendarRecord&&!s.checked&&!t.checked&&!d.checked){
@@ -1786,7 +1701,6 @@
         $('#deleteEntry')&&($('#deleteEntry').hidden=true);
         updateEntryMode();
         $('#entrySheet').hidden=false;
-        hideSchedulePopup();
       }
       function openCalendarEdit(type,id){
         const item=(type==='schedule'?state.schedules:state.tasks).find(x=>x.id===id);
@@ -1811,7 +1725,6 @@
         $('#addDaily').checked=type==='daily';
         updateEntryMode();
         $('#entrySheet').hidden=false;
-        hideSchedulePopup();
       }
       async function deleteCalendarEntry(){
         if(!editingCalendarRecord?.id)return;
@@ -2305,11 +2218,11 @@
         setTimeout(()=>loadCalendarFromWorker(true),60);
         document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});
       }
-      $('#calendarGrid').onclick=e=>{const d=e.target.closest('.day');if(d){const picked=d.dataset.date;selected=picked;renderCal();if(!isTabletLayout()){const liveDay=$(`#calendarGrid .day[data-date="${picked}"]`);showSchedulePopup(picked,liveDay)}}};$('#monthTitle')?.addEventListener('click',()=>{document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});});$('#prevMonth').onclick=()=>moveCalendarMonth(-1);$('#nextMonth').onclick=()=>moveCalendarMonth(1);$('#calendarTodayBtn')&&($('#calendarTodayBtn').onclick=goCalendarToday);$$('.tab[data-type]').forEach(t=>t.onclick=()=>{const type=t.dataset.type,on=Object.values(state.show).filter(Boolean).length;if(state.show[type]&&on===1)return;state.show[type]=!state.show[type];t.classList.toggle('on',state.show[type]);renderCal()});$('#openEntry').onclick=openEntry;$('#closeEntry').onclick=()=>{editingCalendarRecord=null;$('#entrySheet').hidden=true;};$('#deleteEntry')?.addEventListener('click',deleteCalendarEntry);$('#addSchedule').onchange=updateEntryMode;$('#entryForm').onsubmit=saveEntry;$('#entrySubject')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();const el=e.currentTarget;const start=el.selectionStart??el.value.length,end=el.selectionEnd??el.value.length;el.value=el.value.slice(0,start)+'\n'+el.value.slice(end);el.selectionStart=el.selectionEnd=start+1;}});$('#calendarDetail').addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit){openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit);return}const open=e.target.closest('[data-open-schedule-popup]');if(open){const dayEl=$(`#calendarGrid .day[data-date="${selected}"]`);showSchedulePopup(selected,dayEl)}});const schedulePopupBg=$('#schedulePopupBg');if(schedulePopupBg)schedulePopupBg.addEventListener('click',e=>{if(e.target===schedulePopupBg)hideSchedulePopup()});const schedulePopupClose=$('#schedulePopupClose');if(schedulePopupClose)schedulePopupClose.onclick=hideSchedulePopup;const schedulePopupContent=$('#schedulePopupContent');if(schedulePopupContent)schedulePopupContent.addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit)openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit)});document.addEventListener('click',e=>{const bg=$('#schedulePopupBg');if(!bg||bg.hidden||isTabletLayout())return;if(e.target.closest('#schedulePopup')||e.target.closest('.day')||e.target.closest('[data-open-schedule-popup]'))return;hideSchedulePopup()});      const openSettingsBtn=$('#openSettings');if(openSettingsBtn)openSettingsBtn.onclick=openSettings;const closeSettingsBtn=$('#closeSettings');if(closeSettingsBtn)closeSettingsBtn.onclick=closeSettings;const settingsForm=$('#settingsForm');if(settingsForm)settingsForm.onsubmit=saveSettingsForm;const settingLoadBtn=$('#settingLoadNotion');if(settingLoadBtn)settingLoadBtn.onclick=async()=>{await loadProjectsFromWorker(true);loadCalendarFromWorker(false)};const clearSettingsBtn=$('#clearSettings');if(clearSettingsBtn)clearSettingsBtn.onclick=()=>{clearPaperConfig();fillSettingsForm();const s=$('#settingsStatus');if(s)s.textContent='저장된 설정을 지웠어요.'};const cancelToggle=$('#showCanceledSchedules');if(cancelToggle){cancelToggle.checked=state.showCanceled;cancelToggle.onchange=()=>{state.showCanceled=cancelToggle.checked;loadCalendarFromWorker(false)}};const dateStripEl=$('#dateStrip');if(dateStripEl)dateStripEl.ondblclick=toggleWeekStrip;const stickyTopEl=$('#stickyTop');if(stickyTopEl)stickyTopEl.ondblclick=()=>{localStorage.setItem('paperWeekStripHidden','false');applyWeekStripHidden()};const currentMonthLabel=$('#stickyMonthLabel');if(currentMonthLabel)currentMonthLabel.textContent=`${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월`;applyWeekStripHidden();dateStrip();      ['addSchedule','entrySubject'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',updateAppointmentTargetVisibility);el.addEventListener('change',updateAppointmentTargetVisibility);}});
+      $('#calendarGrid').onclick=e=>{const d=e.target.closest('.day');if(d){selected=d.dataset.date;renderCal();renderDetail();}};$('#monthTitle')?.addEventListener('click',()=>{document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});});$('#prevMonth').onclick=()=>moveCalendarMonth(-1);$('#nextMonth').onclick=()=>moveCalendarMonth(1);$('#calendarTodayBtn')&&($('#calendarTodayBtn').onclick=goCalendarToday);$$('.tab[data-type]').forEach(t=>t.onclick=()=>{const type=t.dataset.type,on=Object.values(state.show).filter(Boolean).length;if(state.show[type]&&on===1)return;state.show[type]=!state.show[type];t.classList.toggle('on',state.show[type]);renderCal()});$('#openEntry').onclick=openEntry;$('#closeEntry').onclick=()=>{editingCalendarRecord=null;$('#entrySheet').hidden=true;};$('#deleteEntry')?.addEventListener('click',deleteCalendarEntry);$('#addSchedule').onchange=updateEntryMode;$('#entryForm').onsubmit=saveEntry;$('#entrySubject')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();const el=e.currentTarget;const start=el.selectionStart??el.value.length,end=el.selectionEnd??el.value.length;el.value=el.value.slice(0,start)+'\n'+el.value.slice(end);el.selectionStart=el.selectionEnd=start+1;}});$('#calendarDetail').addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit)openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit)});      const openSettingsBtn=$('#openSettings');if(openSettingsBtn)openSettingsBtn.onclick=openSettings;const closeSettingsBtn=$('#closeSettings');if(closeSettingsBtn)closeSettingsBtn.onclick=closeSettings;const settingsForm=$('#settingsForm');if(settingsForm)settingsForm.onsubmit=saveSettingsForm;const settingLoadBtn=$('#settingLoadNotion');if(settingLoadBtn)settingLoadBtn.onclick=async()=>{await loadProjectsFromWorker(true);loadCalendarFromWorker(false)};const clearSettingsBtn=$('#clearSettings');if(clearSettingsBtn)clearSettingsBtn.onclick=()=>{clearPaperConfig();fillSettingsForm();const s=$('#settingsStatus');if(s)s.textContent='저장된 설정을 지웠어요.'};const cancelToggle=$('#showCanceledSchedules');if(cancelToggle){cancelToggle.checked=state.showCanceled;cancelToggle.onchange=()=>{state.showCanceled=cancelToggle.checked;loadCalendarFromWorker(false)}};const dateStripEl=$('#dateStrip');if(dateStripEl)dateStripEl.ondblclick=toggleWeekStrip;const stickyTopEl=$('#stickyTop');if(stickyTopEl)stickyTopEl.ondblclick=()=>{localStorage.setItem('paperWeekStripHidden','false');applyWeekStripHidden()};const currentMonthLabel=$('#stickyMonthLabel');if(currentMonthLabel)currentMonthLabel.textContent=`${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월`;applyWeekStripHidden();dateStrip();      ['addSchedule','entrySubject'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',updateAppointmentTargetVisibility);el.addEventListener('change',updateAppointmentTargetVisibility);}});
 renderCal();renderDashboard();restoreCalendarCache();
       const savedPage=localStorage.getItem(ACTIVE_PAGE_KEY)||'dashboard';
       page(savedPage,{scroll:false});
-      if(hasPaperConfig()){setTimeout(()=>{loadProjectsFromWorker(true);loadCalendarFromWorker(true);loadDashboardTodayFromWorker()},300)}else setTimeout(()=>openSettings(),250);window.addEventListener('resize',()=>{hideSchedulePopup();renderDetail()});console.assert($('#stickyMonthLabel'),'test: header month label exists');console.assert($$('.navBtn').length===3,'test: nav has 3 tabs');console.assert($('#calendarGrid'),'test: calendar grid exists');
+      if(hasPaperConfig()){setTimeout(()=>{loadProjectsFromWorker(true);loadCalendarFromWorker(true);loadDashboardTodayFromWorker()},300)}else setTimeout(()=>openSettings(),250);window.addEventListener('resize',()=>{renderDetail()});console.assert($('#stickyMonthLabel'),'test: header month label exists');console.assert($$('.navBtn').length===3,'test: nav has 3 tabs');console.assert($('#calendarGrid'),'test: calendar grid exists');
     });
   </script>
 
