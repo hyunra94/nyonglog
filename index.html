@@ -627,6 +627,60 @@
       white-space:nowrap;
     }
     .moneyTitleEditBtn:active{background:var(--yellow)}
+    #ddayBlock .divTitle::after{display:none}
+    #ddayBlock .divTitle{justify-content:space-between}
+    .ddayAddBtn{
+      border:1.4px solid var(--line);
+      border-radius:999px;
+      background:var(--yellow);
+      padding:4px 11px;
+      font-family:'Gaegu';
+      font-size:17px;
+      box-shadow:1.5px 1.5px 0 rgba(47,42,40,.12);
+    }
+    .ddayAddBtn:active{filter:brightness(.95)}
+    #ddayList{display:grid;gap:7px}
+    .ddayRow{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:10px;
+      align-items:center;
+      width:100%;
+      padding:10px 12px;
+      border:1.4px solid var(--line);
+      border-radius:14px;
+      background:rgba(255,255,255,.42);
+      box-shadow:2px 2px 0 rgba(47,42,40,.08);
+      text-align:left;
+    }
+    .ddayRow:active{background:rgba(244,217,139,.28)}
+    .ddayName{
+      display:block;
+      font-family:'Gaegu';
+      font-size:20px;
+      line-height:1.1;
+    }
+    .ddaySub{
+      display:block;
+      color:var(--sub);
+      font-size:11px;
+      margin-top:3px;
+    }
+    .ddayBadge{
+      font-family:'Gaegu';
+      font-size:19px;
+      font-weight:700;
+      white-space:nowrap;
+      padding:4px 12px;
+      border:1.4px solid var(--line);
+      border-radius:999px;
+      background:var(--card);
+      box-shadow:1.5px 1.5px 0 rgba(47,42,40,.1);
+    }
+    .ddayBadge.soon{background:var(--green);border-color:var(--line)}
+    .ddayBadge.today{background:var(--purple);border-color:var(--line)}
+    .ddayBadge.past{background:transparent;color:var(--sub);border-color:rgba(47,42,40,.2);box-shadow:none}
+    .ddayEmpty{margin:4px 0;color:var(--sub);font-size:13px;text-align:center;padding:12px 0}
   </style>
 
 
@@ -872,7 +926,27 @@
           <button class="mini jump" data-target="budget"><h3><span class="pink">가계부</span></h3><p id="dashMoneySummary">오늘 기준 월 가계부 불러오는 중</p></button>
         </div>
       </article>
+      <article class="card" id="ddayBlock">
+        <div class="divTitle">D-day · 기념일<button class="ddayAddBtn" id="openDdayAdd" type="button">+ 추가</button></div>
+        <div id="ddayList"><p class="ddayEmpty">추가된 항목이 없어요.</p></div>
+      </article>
     </section>
+
+    <div class="sheetBg" id="ddaySheet" hidden>
+      <section class="sheet">
+        <div class="handle"></div>
+        <div class="sheetHead"><h3 id="ddaySheetTitle">D-day 추가</h3><button class="icon" id="closeDdaySheet" type="button">×</button></div>
+        <div class="entryForm">
+          <div class="field"><label>이름</label><input id="ddayLabel" autocomplete="off" placeholder="예: 결혼기념일, 생일"></div>
+          <div class="field"><label>날짜</label><input id="ddayDate" type="date"></div>
+          <label class="typeChip" style="justify-content:flex-start;gap:8px"><input type="checkbox" id="ddayRepeat"> 매년 반복 (기념일)</label>
+          <div class="moneySaveActions">
+            <button class="save" id="saveDday" type="button">저장하기</button>
+            <button class="cancel" id="deleteDday" type="button" hidden>삭제</button>
+          </div>
+        </div>
+      </section>
+    </div>
 
     <section id="calendar" class="page">
       <div class="title"><h2>Calendar</h2><small>Schedule · Mon start</small></div>
@@ -1433,6 +1507,100 @@
       }
       $('#calendarGrid').onclick=e=>{const d=e.target.closest('.day');if(d){selected=d.dataset.date;renderCal();renderDetail();}};$('#monthTitle')?.addEventListener('click',()=>{document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});});$('#prevMonth').onclick=()=>moveCalendarMonth(-1);$('#nextMonth').onclick=()=>moveCalendarMonth(1);$('#calendarTodayBtn')&&($('#calendarTodayBtn').onclick=goCalendarToday);$$('.tab[data-type]').forEach(t=>t.onclick=()=>{const type=t.dataset.type,on=Object.values(state.show).filter(Boolean).length;if(state.show[type]&&on===1)return;state.show[type]=!state.show[type];t.classList.toggle('on',state.show[type]);renderCal()});$('#openEntry').onclick=openEntry;$('#closeEntry').onclick=()=>{editingCalendarRecord=null;$('#entrySheet').hidden=true;};$('#deleteEntry')?.addEventListener('click',deleteCalendarEntry);$('#addSchedule').onchange=updateEntryMode;$('#entryForm').onsubmit=saveEntry;$('#entrySubject')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();const el=e.currentTarget;const start=el.selectionStart??el.value.length,end=el.selectionEnd??el.value.length;el.value=el.value.slice(0,start)+'\n'+el.value.slice(end);el.selectionStart=el.selectionEnd=start+1;}});$('#calendarDetail').addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit)openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit)});      const openSettingsBtn=$('#openSettings');if(openSettingsBtn)openSettingsBtn.onclick=openSettings;const closeSettingsBtn=$('#closeSettings');if(closeSettingsBtn)closeSettingsBtn.onclick=closeSettings;const settingsForm=$('#settingsForm');if(settingsForm)settingsForm.onsubmit=saveSettingsForm;const settingLoadBtn=$('#settingLoadNotion');if(settingLoadBtn)settingLoadBtn.onclick=async()=>{await loadProjectsFromWorker(true);loadCalendarFromWorker(false)};const clearSettingsBtn=$('#clearSettings');if(clearSettingsBtn)clearSettingsBtn.onclick=()=>{clearPaperConfig();fillSettingsForm();const s=$('#settingsStatus');if(s)s.textContent='저장된 설정을 지웠어요.'};const cancelToggle=$('#showCanceledSchedules');if(cancelToggle){cancelToggle.checked=state.showCanceled;cancelToggle.onchange=()=>{state.showCanceled=cancelToggle.checked;loadCalendarFromWorker(false)}};const dateStripEl=$('#dateStrip');if(dateStripEl)dateStripEl.ondblclick=toggleWeekStrip;const stickyTopEl=$('#stickyTop');if(stickyTopEl)stickyTopEl.ondblclick=()=>{localStorage.setItem('nyongWeekStripHidden','false');applyWeekStripHidden()};const currentMonthLabel=$('#stickyMonthLabel');if(currentMonthLabel)currentMonthLabel.textContent=`${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월`;applyWeekStripHidden();dateStrip();      ['addSchedule','entrySubject'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',updateAppointmentTargetVisibility);el.addEventListener('change',updateAppointmentTargetVisibility);}});
 renderCal();renderDashboard();restoreCalendarCache();
+
+      // ── D-day · 기념일 ──────────────────────────────
+      const DDAY_KEY='nyonglog_dday_v1';
+      let editingDdayId=null;
+
+      function loadDdays(){try{return JSON.parse(localStorage.getItem(DDAY_KEY)||'[]')}catch{return []}}
+      function saveDdays(list){try{localStorage.setItem(DDAY_KEY,JSON.stringify(list))}catch(e){console.warn(e)}}
+
+      function calcDday(dateStr,repeat){
+        const todayD=new Date(key(today));
+        let target=new Date(dateStr);
+        if(repeat){
+          target.setFullYear(todayD.getFullYear());
+          if(target<todayD)target.setFullYear(todayD.getFullYear()+1);
+        }
+        const diff=Math.round((target-todayD)/(1000*60*60*24));
+        return diff;
+      }
+
+      function ddayBadgeText(diff,repeat,dateStr){
+        if(diff===0)return {text:'D-Day',cls:'today'};
+        if(diff>0)return {text:`D-${diff}`,cls:diff<=7?'soon':''};
+        if(repeat){
+          // 주년 계산
+          const target=new Date(dateStr);
+          const years=today.getFullYear()-target.getFullYear();
+          return {text:`${years}주년`,cls:'past'};
+        }
+        return {text:`D+${Math.abs(diff)}`,cls:'past'};
+      }
+
+      function renderDdays(){
+        const list=$('#ddayList');if(!list)return;
+        const items=loadDdays();
+        if(!items.length){list.innerHTML='<p class="ddayEmpty">추가된 항목이 없어요.</p>';return}
+        const sorted=[...items].sort((a,b)=>{
+          const da=calcDday(a.date,a.repeat),db=calcDday(b.date,b.repeat);
+          const aa=da<0?da+99999:da, bb=db<0?db+99999:db;
+          return aa-bb;
+        });
+        list.innerHTML=sorted.map(item=>{
+          const diff=calcDday(item.date,item.repeat);
+          const {text,cls}=ddayBadgeText(diff,item.repeat,item.date);
+          const sub=item.repeat?`매년 반복 · ${item.date.slice(5).replace('-','/')}`:item.date;
+          return `<button class="ddayRow" data-dday-id="${item.id}" type="button"><div><span class="ddayName">${item.label}</span><span class="ddaySub">${sub}</span></div><span class="ddayBadge ${cls}">${text}</span></button>`;
+        }).join('');
+      }
+
+      function openDdaySheet(id=null){
+        editingDdayId=id;
+        const items=loadDdays();
+        const item=id?items.find(x=>x.id===id):null;
+        const title=$('#ddaySheetTitle');if(title)title.textContent=id?'D-day 수정':'D-day 추가';
+        const labelEl=$('#ddayLabel');if(labelEl)labelEl.value=item?.label||'';
+        const dateEl=$('#ddayDate');if(dateEl)dateEl.value=item?.date||'';
+        const repeatEl=$('#ddayRepeat');if(repeatEl)repeatEl.checked=item?.repeat||false;
+        const delBtn=$('#deleteDday');if(delBtn)delBtn.hidden=!id;
+        $('#ddaySheet').hidden=false;
+      }
+
+      function closeDdaySheet(){$('#ddaySheet').hidden=true;editingDdayId=null}
+
+      function saveDday(){
+        const label=($('#ddayLabel')?.value||'').trim();
+        const date=$('#ddayDate')?.value||'';
+        const repeat=$('#ddayRepeat')?.checked||false;
+        if(!label||!date)return;
+        const items=loadDdays();
+        if(editingDdayId){
+          const idx=items.findIndex(x=>x.id===editingDdayId);
+          if(idx>=0)items[idx]={...items[idx],label,date,repeat};
+        }else{
+          items.push({id:Date.now().toString(36),label,date,repeat});
+        }
+        saveDdays(items);
+        renderDdays();
+        closeDdaySheet();
+      }
+
+      function deleteDday(){
+        if(!editingDdayId)return;
+        const items=loadDdays().filter(x=>x.id!==editingDdayId);
+        saveDdays(items);
+        renderDdays();
+        closeDdaySheet();
+      }
+
+      $('#openDdayAdd')?.addEventListener('click',()=>openDdaySheet());
+      $('#closeDdaySheet')?.addEventListener('click',closeDdaySheet);
+      $('#ddaySheet')?.addEventListener('click',e=>{if(e.target?.id==='ddaySheet')closeDdaySheet()});
+      $('#saveDday')?.addEventListener('click',saveDday);
+      $('#deleteDday')?.addEventListener('click',deleteDday);
+      $('#ddayList')?.addEventListener('click',e=>{const row=e.target.closest('[data-dday-id]');if(row)openDdaySheet(row.dataset.ddayId)});
+      renderDdays();
       const savedPage=localStorage.getItem(ACTIVE_PAGE_KEY)||'dashboard';
       page(savedPage,{scroll:false});
       if(hasPaperConfig()){setTimeout(()=>{loadProjectsFromWorker(true);loadCalendarFromWorker(true);loadDashboardTodayFromWorker()},300)}else setTimeout(()=>openSettings(),250);window.addEventListener('resize',()=>{renderDetail()});console.assert($('#stickyMonthLabel'),'test: header month label exists');console.assert($$('.navBtn').length===3,'test: nav has 3 tabs');console.assert($('#calendarGrid'),'test: calendar grid exists');
