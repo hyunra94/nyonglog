@@ -1055,8 +1055,8 @@
 
   <script>
     document.addEventListener('DOMContentLoaded',()=>{
-      const PAPER_CONFIG_KEY='paperLogWorkerConfig';
-      const PAPER_SECRET_KEY='paperLogSecretKey';
+      const PAPER_CONFIG_KEY='nyongLogWorkerConfig';
+      const PAPER_SECRET_KEY='nyongLogSecretKey';
       const getStoredConfig=()=>{
         try{return JSON.parse(localStorage.getItem(PAPER_CONFIG_KEY)||'{}')}catch{return {}}
       };
@@ -1144,7 +1144,7 @@
         });
       }
       const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-      const ACTIVE_PAGE_KEY='paperLogActivePage';
+      const ACTIVE_PAGE_KEY='nyongLogActivePage';
       const wk=['sun','mon','tue','wed','thu','fri','sat'], wkMon=['mon','tue','wed','thu','fri','sat','sun'];
       const nowKST=()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-').map(Number);return new Date(p[0],p[1]-1,p[2])};
       const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
@@ -1198,7 +1198,7 @@
       function scheduleColor(subject){if(subject==='취소')return 'canceled';if(subject==='약속')return 'meeting';if(subject==='개인일정')return 'personal';return 'work'}
       function calendarMarkers(v){const markers=[];v.schedule.forEach(x=>markers.push(scheduleColor(x.subject)));return markers.slice(0,4)}
       function monthRange(){const from=new Date(view.getFullYear(),view.getMonth(),1),to=new Date(view.getFullYear(),view.getMonth()+1,0);return{from:key(from),to:key(to)}}
-      const CALENDAR_CACHE_KEY='paperlog_calendar_cache_v3';
+      const CALENDAR_CACHE_KEY='nyonglog_calendar_cache_v3';
       let calendarLoadSeq=0, projectsLoadedOnce=false;
       function calendarMonthKey(){return `${view.getFullYear()}-${String(view.getMonth()+1).padStart(2,'0')}`}
       function uniqueByIdDate(items){const seen=new Set();return items.filter(item=>{const k=`${item.id||item.title}_${item.date}_${item.type||''}`;if(seen.has(k))return false;seen.add(k);return true})}
@@ -1412,8 +1412,8 @@
       function fillSettingsForm(){const cfg=getPaperConfig();const workerName=$('#settingWorkerName'),workerId=$('#settingWorkerId'),secret=$('#settingSecretKey'),remember=$('#settingRememberSecret');if(workerName)workerName.value=cfg.workerName||'';if(workerId)workerId.value=cfg.workerId||'';if(secret)secret.value=cfg.secretKey||'';if(remember)remember.checked=Boolean(localStorage.getItem(PAPER_SECRET_KEY)||cfg.secretKey)}
       async function saveSettingsForm(e){e.preventDefault();const cfg={workerName:$('#settingWorkerName').value.trim(),workerId:$('#settingWorkerId').value.trim(),secretKey:$('#settingSecretKey').value.trim()};const status=$('#settingsStatus');if(!cfg.workerName||!cfg.workerId||!cfg.secretKey){if(status)status.textContent='Worker 앞부분, Cloudflare ID, SECRET Key를 모두 입력해 주세요.';return}if(!/^[a-zA-Z0-9-]+$/.test(cfg.workerName)||!/^[a-zA-Z0-9-]+$/.test(cfg.workerId)){if(status)status.textContent='Worker 앞부분과 Cloudflare ID는 영문, 숫자, 하이픈만 입력해 주세요.';return}setPaperConfig(cfg,$('#settingRememberSecret')?.checked!==false);if(status)status.textContent='설정을 저장했어요. Notion을 불러옵니다...';await loadCalendarFromWorker(false);if((status?.textContent||'').includes('완료'))closeSettings()}
       async function toggleTodoCheck(todoId){const tasks=state.tasks.filter(x=>x.id===todoId);if(!tasks.length)return;const prev=!!tasks[0].done,next=!prev;tasks.forEach(t=>t.done=next);renderCal();renderDashboard();saveCalendarCache();try{const res=await window.paperLog.fetch('/api/todo/check',{method:'PATCH',body:JSON.stringify({id:todoId,done:next})});const data=await res.json().catch(()=>({}));if(!res.ok||data.ok===false)throw new Error(data.message||data.error||'체크 저장 실패');const status=$('#syncStatus');if(status)status.textContent='체크 상태를 Notion에 반영했어요.';setTimeout(()=>loadCalendarFromWorker(true),500)}catch(err){tasks.forEach(t=>t.done=prev);renderCal();renderDashboard();saveCalendarCache();alert('Notion 체크 반영 실패: '+err.message)}}
-      function applyWeekStripHidden(){document.body.classList.toggle('weekStripHidden',localStorage.getItem('paperWeekStripHidden')==='true')}
-      function toggleWeekStrip(){const next=!(localStorage.getItem('paperWeekStripHidden')==='true');localStorage.setItem('paperWeekStripHidden',String(next));applyWeekStripHidden()}
+      function applyWeekStripHidden(){document.body.classList.toggle('weekStripHidden',localStorage.getItem('nyongWeekStripHidden')==='true')}
+      function toggleWeekStrip(){const next=!(localStorage.getItem('nyongWeekStripHidden')==='true');localStorage.setItem('nyongWeekStripHidden',String(next));applyWeekStripHidden()}
       $$('.navBtn').forEach(b=>b.onclick=()=>page(b.dataset.target));$$('.jump').forEach(b=>b.onclick=()=>page(b.dataset.target));$$('[data-scroll]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.scroll).scrollIntoView({behavior:'smooth'}));function moveCalendarMonth(offset){
         view=new Date(view.getFullYear(),view.getMonth()+offset,1);
         const first=key(new Date(view.getFullYear(),view.getMonth(),1));
@@ -1431,7 +1431,7 @@
         setTimeout(()=>loadCalendarFromWorker(true),60);
         document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});
       }
-      $('#calendarGrid').onclick=e=>{const d=e.target.closest('.day');if(d){selected=d.dataset.date;renderCal();renderDetail();}};$('#monthTitle')?.addEventListener('click',()=>{document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});});$('#prevMonth').onclick=()=>moveCalendarMonth(-1);$('#nextMonth').onclick=()=>moveCalendarMonth(1);$('#calendarTodayBtn')&&($('#calendarTodayBtn').onclick=goCalendarToday);$$('.tab[data-type]').forEach(t=>t.onclick=()=>{const type=t.dataset.type,on=Object.values(state.show).filter(Boolean).length;if(state.show[type]&&on===1)return;state.show[type]=!state.show[type];t.classList.toggle('on',state.show[type]);renderCal()});$('#openEntry').onclick=openEntry;$('#closeEntry').onclick=()=>{editingCalendarRecord=null;$('#entrySheet').hidden=true;};$('#deleteEntry')?.addEventListener('click',deleteCalendarEntry);$('#addSchedule').onchange=updateEntryMode;$('#entryForm').onsubmit=saveEntry;$('#entrySubject')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();const el=e.currentTarget;const start=el.selectionStart??el.value.length,end=el.selectionEnd??el.value.length;el.value=el.value.slice(0,start)+'\n'+el.value.slice(end);el.selectionStart=el.selectionEnd=start+1;}});$('#calendarDetail').addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit)openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit)});      const openSettingsBtn=$('#openSettings');if(openSettingsBtn)openSettingsBtn.onclick=openSettings;const closeSettingsBtn=$('#closeSettings');if(closeSettingsBtn)closeSettingsBtn.onclick=closeSettings;const settingsForm=$('#settingsForm');if(settingsForm)settingsForm.onsubmit=saveSettingsForm;const settingLoadBtn=$('#settingLoadNotion');if(settingLoadBtn)settingLoadBtn.onclick=async()=>{await loadProjectsFromWorker(true);loadCalendarFromWorker(false)};const clearSettingsBtn=$('#clearSettings');if(clearSettingsBtn)clearSettingsBtn.onclick=()=>{clearPaperConfig();fillSettingsForm();const s=$('#settingsStatus');if(s)s.textContent='저장된 설정을 지웠어요.'};const cancelToggle=$('#showCanceledSchedules');if(cancelToggle){cancelToggle.checked=state.showCanceled;cancelToggle.onchange=()=>{state.showCanceled=cancelToggle.checked;loadCalendarFromWorker(false)}};const dateStripEl=$('#dateStrip');if(dateStripEl)dateStripEl.ondblclick=toggleWeekStrip;const stickyTopEl=$('#stickyTop');if(stickyTopEl)stickyTopEl.ondblclick=()=>{localStorage.setItem('paperWeekStripHidden','false');applyWeekStripHidden()};const currentMonthLabel=$('#stickyMonthLabel');if(currentMonthLabel)currentMonthLabel.textContent=`${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월`;applyWeekStripHidden();dateStrip();      ['addSchedule','entrySubject'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',updateAppointmentTargetVisibility);el.addEventListener('change',updateAppointmentTargetVisibility);}});
+      $('#calendarGrid').onclick=e=>{const d=e.target.closest('.day');if(d){selected=d.dataset.date;renderCal();renderDetail();}};$('#monthTitle')?.addEventListener('click',()=>{document.querySelector('#calendar')?.scrollIntoView({behavior:'smooth',block:'start'});});$('#prevMonth').onclick=()=>moveCalendarMonth(-1);$('#nextMonth').onclick=()=>moveCalendarMonth(1);$('#calendarTodayBtn')&&($('#calendarTodayBtn').onclick=goCalendarToday);$$('.tab[data-type]').forEach(t=>t.onclick=()=>{const type=t.dataset.type,on=Object.values(state.show).filter(Boolean).length;if(state.show[type]&&on===1)return;state.show[type]=!state.show[type];t.classList.toggle('on',state.show[type]);renderCal()});$('#openEntry').onclick=openEntry;$('#closeEntry').onclick=()=>{editingCalendarRecord=null;$('#entrySheet').hidden=true;};$('#deleteEntry')?.addEventListener('click',deleteCalendarEntry);$('#addSchedule').onchange=updateEntryMode;$('#entryForm').onsubmit=saveEntry;$('#entrySubject')?.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.ctrlKey){e.preventDefault();const el=e.currentTarget;const start=el.selectionStart??el.value.length,end=el.selectionEnd??el.value.length;el.value=el.value.slice(0,start)+'\n'+el.value.slice(end);el.selectionStart=el.selectionEnd=start+1;}});$('#calendarDetail').addEventListener('click',e=>{if(e.target.closest('a'))return;const edit=e.target.closest('[data-calendar-edit]');if(edit&&edit.dataset.calendarEdit)openCalendarEdit(edit.dataset.calendarType,edit.dataset.calendarEdit)});      const openSettingsBtn=$('#openSettings');if(openSettingsBtn)openSettingsBtn.onclick=openSettings;const closeSettingsBtn=$('#closeSettings');if(closeSettingsBtn)closeSettingsBtn.onclick=closeSettings;const settingsForm=$('#settingsForm');if(settingsForm)settingsForm.onsubmit=saveSettingsForm;const settingLoadBtn=$('#settingLoadNotion');if(settingLoadBtn)settingLoadBtn.onclick=async()=>{await loadProjectsFromWorker(true);loadCalendarFromWorker(false)};const clearSettingsBtn=$('#clearSettings');if(clearSettingsBtn)clearSettingsBtn.onclick=()=>{clearPaperConfig();fillSettingsForm();const s=$('#settingsStatus');if(s)s.textContent='저장된 설정을 지웠어요.'};const cancelToggle=$('#showCanceledSchedules');if(cancelToggle){cancelToggle.checked=state.showCanceled;cancelToggle.onchange=()=>{state.showCanceled=cancelToggle.checked;loadCalendarFromWorker(false)}};const dateStripEl=$('#dateStrip');if(dateStripEl)dateStripEl.ondblclick=toggleWeekStrip;const stickyTopEl=$('#stickyTop');if(stickyTopEl)stickyTopEl.ondblclick=()=>{localStorage.setItem('nyongWeekStripHidden','false');applyWeekStripHidden()};const currentMonthLabel=$('#stickyMonthLabel');if(currentMonthLabel)currentMonthLabel.textContent=`${today.getFullYear()}년 ${String(today.getMonth()+1).padStart(2,'0')}월`;applyWeekStripHidden();dateStrip();      ['addSchedule','entrySubject'].forEach(id=>{const el=$('#'+id);if(el){el.addEventListener('input',updateAppointmentTargetVisibility);el.addEventListener('change',updateAppointmentTargetVisibility);}});
 renderCal();renderDashboard();restoreCalendarCache();
       const savedPage=localStorage.getItem(ACTIVE_PAGE_KEY)||'dashboard';
       page(savedPage,{scroll:false});
@@ -1444,8 +1444,8 @@ renderCal();renderDashboard();restoreCalendarCache();
     document.addEventListener('DOMContentLoaded',()=>{
       const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
       const wkMon=['mon','tue','wed','thu','fri','sat','sun'];
-      const MONEY_CACHE_KEY='paperlog_money_cache_v1';
-      const MONEY_SUGGESTION_KEY='paperlog_money_suggestions_v1';
+      const MONEY_CACHE_KEY='nyonglog_money_cache_v1';
+      const MONEY_SUGGESTION_KEY='nyonglog_money_suggestions_v1';
       const today=(()=>{const p=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-').map(Number);return new Date(p[0],p[1]-1,p[2])})();
       const key=d=>`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
       const won=n=>new Intl.NumberFormat('ko-KR').format(Number(n||0));
@@ -1459,7 +1459,7 @@ renderCal();renderDashboard();restoreCalendarCache();
       let moneySaving=false;
       let lastMoneySubmitKey='';
       let lastMoneySubmitAt=0;
-      const MONEY_TITLE_ITEMS_KEY='paperlog_money_title_items_v1';
+      const MONEY_TITLE_ITEMS_KEY='nyonglog_money_title_items_v1';
       const MONEY_TITLE_DEFAULTS={
         expense:['식비 및 음식','커피 및 음료','교통비(자전거·킥보드)','교통비(택시)','미용','약·영양제','보험료','오락','기타'],
         income:['월급 기본급','자가운전보조금','시간외수당','식대','이자','기타'],
